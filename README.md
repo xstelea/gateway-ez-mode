@@ -1,10 +1,14 @@
 # ez-gateway
 Some higher-level abstractions on top of the Radix Babylon Gateway TypeScript SDK.
 
-All devs in Radix, whether frontend or backend, surely have written helpers that make it easier to fetch data from the Radix Gateway. While Radix some great SDKs, sometimes you just want a very simple thing like get an account's balances. I would love it if we could collaborate as a community to share these helpers as a common repository of abstractions. I have already implemented one here, which makes it easier to fetch an account's balances. Feel free to contribute!
+All devs in Radix, whether frontend or backend, surely have written helpers that make it easier to fetch data from the Radix Gateway. While Radix some great SDKs, sometimes you just want a very simple thing like get an account's balances. I would love it if we could collaborate as a community to share these helpers as a common repository of abstractions.  Feel free to contribute!
+
+# Installation
+
+`npm install @calamari-radix/gateway-ez-mode`
 
 # Basic usage
-I
+I have already implemented one helper here, which makes it easier to fetch an account's balances.
 
 ```ts
 const account = "account_rdx1cx26ckdep9t0lut3qaz3q8cj9wey3tdee0rdxhc5f0nce64lw5gt70"
