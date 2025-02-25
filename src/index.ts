@@ -3,7 +3,7 @@ import { getBalancesForAccount as getFungibleBalancesForAccount } from "./accoun
 import { FungibleResourceBalance } from "./types"
 
 
-
+// Please add methods to this class to extend the functionality
 export class GatewayEzMode {
     gateway: GatewayApiClient
     constructor(gateway?: GatewayApiClient) {
