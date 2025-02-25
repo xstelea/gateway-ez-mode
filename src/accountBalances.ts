@@ -2,7 +2,6 @@ import { EntityMetadataCollection, GatewayApiClient, ResourceAggregationLevel } 
 import { FungibleResourceBalance } from "./types";
 
 
-
 function extractStringMetadata(metadataItems: EntityMetadataCollection, key: string): string | null {
     const item = metadataItems.items.find((item) => item.key == key);
     if (!item) return null;

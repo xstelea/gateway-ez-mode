@@ -1,6 +1,6 @@
 {
-  "name": "gateway-ez-mode",
-  "version": "1.0.0",
+  "name": "@calamari-radix/gateway-ez-mode",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "build": "rm -r dist && tsc -p tsconfig.build.json",
@@ -8,9 +8,12 @@
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "repository": {
+    "url": "https://github.com/CalamariRadix/gateway-ez-mode",
+    "type": "github"
+  },
+  "license": "MIT",
+  "description": "Some higher-level abstractions on top of the Radix Babylon Gateway TypeScript SDK",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/jest": "^29.5.14",
