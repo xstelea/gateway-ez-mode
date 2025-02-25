@@ -11,7 +11,7 @@ describe('gatewaySdk', () => {
     });
 
     it('should not error when I ask for an accounts balances', async () => {
-        const account = "account_rdx12yspdmpd6jdgcffkk6vjkqa9fagf3wnha5xd06s3uje5wr9664arkf"
+        const account = "account_rdx1cx26ckdep9t0lut3qaz3q8cj9wey3tdee0rdxhc5f0nce64lw5gt70"
         const gateway = new GatewayEzMode
         const balances = await gateway.getAllFungibleAccountBalances(account)
         for (const balance of balances) {
