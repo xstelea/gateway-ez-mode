@@ -11,10 +11,10 @@ All devs in Radix, whether frontend or backend, surely have written helpers that
 I have already implemented one helper here, which makes it easier to fetch an account's balances.
 
 ```ts
-const account = "account_rdx1cx26ckdep9t0lut3qaz3q8cj9wey3tdee0rdxhc5f0nce64lw5gt70"
 const gateway = new GatewayEzMode()
-const balances = await gateway.getAllFungibleAccountBalances(account)
-console.log(balance)
+const account = gateway.getAccount(SOME_RANDOM_ACCOUNT)
+const balances = await account.getFungibleBalances()
+console.log(balances)
 
 /*
 output:
