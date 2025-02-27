@@ -1,6 +1,7 @@
 import { GatewayApiClient } from "@radixdlt/babylon-gateway-api-sdk";
-import { FungibleResourceBalance } from "./types";
-import { getFungibleBalancesForAccount } from "./accountBalances";
+import { FungibleResourceBalance, NftBalance } from "./types";
+import { getFungibleBalancesForAccount } from "./fungibleAccountBalances";
+import { getNonFungibleBalancesForAccount } from "./nftBalances";
 
 export class Account {
     private gateway: GatewayApiClient;
@@ -13,5 +14,9 @@ export class Account {
 
     getFungibleBalances(): Promise<FungibleResourceBalance[]> {
         return getFungibleBalancesForAccount(this.gateway, this.address)
+    }
+
+    getNftBalances(): Promise<NftBalance[]> {
+        return getNonFungibleBalancesForAccount(this.gateway, this.address)
     }
 }
