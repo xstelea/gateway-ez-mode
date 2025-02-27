@@ -9,14 +9,14 @@ All devs in Radix, whether frontend or backend, surely have written helpers that
 
 Find it on [NPM](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
 
-# Basic usage
-I have already implemented one helper here, which makes it easier to fetch an account's balances.
+# Example usage
+Here's an example of a helper that has already been implemented
 
 ```ts
 const gateway = new GatewayEzMode()
 const account = gateway.getAccount(SOME_RANDOM_ACCOUNT)
-const balances = await account.getFungibleBalances()
-console.log(balances)
+const fungibleBalances = await account.getFungibleBalances()
+console.log(fungibleBalances)
 
 /*
 output:
@@ -33,6 +33,32 @@ output:
     },
     ...
 ]
+*/
+
+const nftBalances = await account.getNftBalances()
+console.log(nftBalances)
+
+/*
+    {
+      resourceInfo: {
+        resourceAddress: 'resource_rdx1n2dd0w53zpdlqdz65vpymygj8a60vqnggyuxfpfdldjmy2224x020q',
+        name: 'Domain',
+        description: 'NFT that represents the domain name you own.',
+        symbol: null,
+        iconUrl: 'https://rns.foundation/assets/icons/domain-component.png',
+        infoUrl: null,
+        tags: [ 'domain', 'Radix Name Service' ]
+      },
+      nftBalance: [
+        {
+          id: '[43564ecf740b11ea807aa013fa0b5230]',
+          keyImageUrl: 'https://qr.rns.foundation/pegging.xrd',
+          name: 'pegging.xrd',
+          description: null
+        }
+      ]
+    },
+    ...
 */
 ```
 
