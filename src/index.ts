@@ -1,6 +1,5 @@
 import { GatewayApiClient } from "@radixdlt/babylon-gateway-api-sdk"
-import { getBalancesForAccount as getFungibleBalancesForAccount } from "./accountBalances"
-import { FungibleResourceBalance } from "./types"
+import { Account } from "./account"
 
 
 // Please add methods to this class to extend the functionality
@@ -17,7 +16,7 @@ export class GatewayEzMode {
         }
     }
 
-    async getAllFungibleAccountBalances(accountAddress: string): Promise<FungibleResourceBalance[]> {
-        return getFungibleBalancesForAccount(this.gateway, accountAddress)
+    getAccount(address: string): Account {
+        return new Account(address, this.gateway)
     }
 }

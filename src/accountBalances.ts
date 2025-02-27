@@ -16,7 +16,7 @@ function extractUrlMetadata(metadataItems: EntityMetadataCollection, key: string
     return item.value.typed.value;
 }
 
-export async function getBalancesForAccount(gatewayApi: GatewayApiClient, address: string): Promise<FungibleResourceBalance[]> {
+export async function getFungibleBalancesForAccount(gatewayApi: GatewayApiClient, address: string): Promise<FungibleResourceBalance[]> {
     const balances = await gatewayApi.state.innerClient.entityFungiblesPage({
         stateEntityFungiblesPageRequest: {
             address: address,
