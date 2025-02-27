@@ -30,12 +30,12 @@ describe('gatewaySdk', () => {
         const account = gateway.getAccount(DELETED_RATTA_ACCOUNT)
         const balances = await account.getFungibleBalances()
         expect(balances).toBeDefined()
-        const rattaBalance = balances.find((balance) => balance.token.resourceAddress === RATTA_RESOURCE)
+        const rattaBalance = balances.find((balance) => balance.resourceInfo.resourceAddress === RATTA_RESOURCE)
         if (!rattaBalance) {
             throw new Error("No ratta balance found")
         }
         expect(rattaBalance.balance).toBe("1")
-        expect(rattaBalance.token.resourceAddress).toBe(RATTA_RESOURCE)
+        expect(rattaBalance.resourceInfo.resourceAddress).toBe(RATTA_RESOURCE)
     });
 
     // use the account class on its own with a regular gateway instance
@@ -43,4 +43,13 @@ describe('gatewaySdk', () => {
         const account = new Account(SOME_RANDOM_ACCOUNT)
         await account.getFungibleBalances()
     });
+
+    // get nfts for an account
+    it('should be able to get nft balances', async () => {
+        const account = new Account(SOME_RANDOM_ACCOUNT)
+        const balances = await account.getNftBalances()
+        balances.forEach((balance) => {
+            console.log(balance)
+        })
+    })
 });
