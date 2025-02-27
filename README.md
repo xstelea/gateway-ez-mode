@@ -7,6 +7,8 @@ All devs in Radix, whether frontend or backend, surely have written helpers that
 
 `npm install @calamari-radix/gateway-ez-mode`
 
+Find it on [NPM](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
+
 # Basic usage
 I have already implemented one helper here, which makes it easier to fetch an account's balances.
 
