@@ -1,26 +1,26 @@
 import {
     GatewayApiClient,
     TransactionStatusResponse,
-} from "@radixdlt/babylon-gateway-api-sdk";
+} from '@radixdlt/babylon-gateway-api-sdk';
 
 export class TransactionPollingError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = "TransactionPollingError";
+        this.name = 'TransactionPollingError';
     }
 }
 
 export class TransactionPollingAbortedError extends TransactionPollingError {
     constructor() {
-        super("Transaction polling was aborted");
-        this.name = "TransactionPollingAbortedError";
+        super('Transaction polling was aborted');
+        this.name = 'TransactionPollingAbortedError';
     }
 }
 
 export class TransactionPollingTimeoutError extends TransactionPollingError {
     constructor() {
-        super("Transaction polling timed out");
-        this.name = "TransactionPollingTimeoutError";
+        super('Transaction polling timed out');
+        this.name = 'TransactionPollingTimeoutError';
     }
 }
 
@@ -60,7 +60,7 @@ export const pollTransactionStatus = (
         delayFn = (retry: number) =>
             Math.min(baseDelay * Math.pow(2, retry), maxDelay),
         gatewayApiClient = GatewayApiClient.initialize({
-            applicationName: "",
+            applicationName: '',
             networkId: 1,
         }),
     } = options || {};
@@ -70,11 +70,11 @@ export const pollTransactionStatus = (
         let retry = 0;
 
         if (abortSignal?.aborted) {
-            throw new TransactionPollingAbortedError()
+            throw new TransactionPollingAbortedError();
         }
 
         abortSignal?.addEventListener(
-            "abort",
+            'abort',
             () => {
                 throw new TransactionPollingAbortedError();
             },
@@ -82,13 +82,13 @@ export const pollTransactionStatus = (
         );
 
         while (!response && retry < maxRetries) {
-            const result = await gatewayApiClient.transaction.getStatus(
-                transactionId
-            );
+            const result =
+                await gatewayApiClient.transaction.getStatus(transactionId);
 
-            if (result.intent_status !== "Pending"
-                && result.intent_status !== "LikelyButNotCertainRejection"
-                && result.intent_status !== "Unknown"
+            if (
+                result.intent_status !== 'Pending' &&
+                result.intent_status !== 'LikelyButNotCertainRejection' &&
+                result.intent_status !== 'Unknown'
             ) {
                 response = result;
                 break;
@@ -104,5 +104,5 @@ export const pollTransactionStatus = (
         }
 
         return response;
-    })()
+    })();
 };

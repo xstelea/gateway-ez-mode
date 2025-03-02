@@ -1,7 +1,8 @@
 # gateway-ez-mode
+
 Some higher-level abstractions on top of the Radix Babylon Gateway TypeScript SDK.
 
-All devs in Radix, whether frontend or backend, surely have written helpers that make it easier to fetch data from the Radix Gateway. While Radix some great SDKs, sometimes you just want a very simple thing like get an account's balances. I would love it if we could collaborate as a community to share these helpers as a common repository of abstractions.  Feel free to contribute!
+All devs in Radix, whether frontend or backend, surely have written helpers that make it easier to fetch data from the Radix Gateway. While Radix some great SDKs, sometimes you just want a very simple thing like get an account's balances. I would love it if we could collaborate as a community to share these helpers as a common repository of abstractions. Feel free to contribute!
 
 # Installation
 
@@ -10,13 +11,14 @@ All devs in Radix, whether frontend or backend, surely have written helpers that
 Find it on [NPM](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
 
 # Example usage
+
 Here's an example of a helper that has already been implemented
 
 ```ts
-const gateway = new GatewayEzMode()
-const account = gateway.getAccount(SOME_RANDOM_ACCOUNT)
-const fungibleBalances = await account.getFungibleBalances()
-console.log(fungibleBalances)
+const gateway = new GatewayEzMode();
+const account = gateway.getAccount(SOME_RANDOM_ACCOUNT);
+const fungibleBalances = await account.getFungibleBalances();
+console.log(fungibleBalances);
 
 /*
 output:
@@ -35,8 +37,8 @@ output:
 ]
 */
 
-const nftBalances = await account.getNftBalances()
-console.log(nftBalances)
+const nftBalances = await account.getNftBalances();
+console.log(nftBalances);
 
 /*
     {
