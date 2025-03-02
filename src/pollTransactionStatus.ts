@@ -1,27 +1,27 @@
 import {
-  GatewayApiClient,
-  TransactionStatusResponse,
+    GatewayApiClient,
+    TransactionStatusResponse,
 } from "@radixdlt/babylon-gateway-api-sdk";
 
 export class TransactionPollingError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "TransactionPollingError";
-  }
+    constructor(message: string) {
+        super(message);
+        this.name = "TransactionPollingError";
+    }
 }
 
 export class TransactionPollingAbortedError extends TransactionPollingError {
-  constructor() {
-    super("Transaction polling was aborted");
-    this.name = "TransactionPollingAbortedError";
-  }
+    constructor() {
+        super("Transaction polling was aborted");
+        this.name = "TransactionPollingAbortedError";
+    }
 }
 
 export class TransactionPollingTimeoutError extends TransactionPollingError {
-  constructor() {
-    super("Transaction polling timed out");
-    this.name = "TransactionPollingTimeoutError";
-  }
+    constructor() {
+        super("Transaction polling timed out");
+        this.name = "TransactionPollingTimeoutError";
+    }
 }
 
 /**
@@ -34,12 +34,12 @@ export class TransactionPollingTimeoutError extends TransactionPollingError {
  * @property gatewayApiClient - Custom GatewayApiClient instance (default: new instance with networkId 1)
  */
 export type PollTransactionStatusOptions = Partial<{
-  abortSignal: AbortSignal;
-  baseDelay: number;
-  maxRetries: number;
-  maxDelay: number;
-  delayFn: (retry: number) => number;
-  gatewayApiClient?: GatewayApiClient;
+    abortSignal: AbortSignal;
+    baseDelay: number;
+    maxRetries: number;
+    maxDelay: number;
+    delayFn: (retry: number) => number;
+    gatewayApiClient?: GatewayApiClient;
 }>;
 
 /**
@@ -49,60 +49,57 @@ export type PollTransactionStatusOptions = Partial<{
  * @returns A promise that resolves to the transaction status.
  */
 export const pollTransactionStatus = (
-  transactionId: string,
-  options?: PollTransactionStatusOptions
+    transactionId: string,
+    options?: PollTransactionStatusOptions
 ) => {
-  const {
-    abortSignal,
-    baseDelay = 1000,
-    maxRetries = 10,
-    maxDelay = 10000,
-    delayFn = (retry: number) =>
-      Math.min(baseDelay * Math.pow(2, retry), maxDelay),
-    gatewayApiClient = GatewayApiClient.initialize({
-      applicationName: "",
-      networkId: 1,
-    }),
-  } = options || {};
+    const {
+        abortSignal,
+        baseDelay = 1000,
+        maxRetries = 10,
+        maxDelay = 10000,
+        delayFn = (retry: number) =>
+            Math.min(baseDelay * Math.pow(2, retry), maxDelay),
+        gatewayApiClient = GatewayApiClient.initialize({
+            applicationName: "",
+            networkId: 1,
+        }),
+    } = options || {};
 
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise<TransactionStatusResponse>(async (resolve, reject) => {
-    let response: TransactionStatusResponse | undefined;
-    let retry = 0;
+    return (async () => {
+        let response: TransactionStatusResponse | undefined;
+        let retry = 0;
 
-    if (abortSignal?.aborted) {
-      reject(new TransactionPollingAbortedError());
-      return;
-    }
+        if (abortSignal?.aborted) {
+            throw new TransactionPollingAbortedError()
+        }
 
-    abortSignal?.addEventListener(
-      "abort",
-      () => {
-        reject(new TransactionPollingAbortedError());
-      },
-      { once: true }
-    );
+        abortSignal?.addEventListener(
+            "abort",
+            () => {
+                throw new TransactionPollingAbortedError();
+            },
+            { once: true }
+        );
 
-    while (!response && retry < maxRetries) {
-      const result = await gatewayApiClient.transaction.getStatus(
-        transactionId
-      );
+        while (!response && retry < maxRetries) {
+            const result = await gatewayApiClient.transaction.getStatus(
+                transactionId
+            );
 
-      if (result.intent_status !== "Pending") {
-        response = result;
-        break;
-      }
+            if (result.intent_status !== "Pending") {
+                response = result;
+                break;
+            }
 
-      const delay = delayFn(retry);
-      retry = retry + 1;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
+            const delay = delayFn(retry);
+            retry = retry + 1;
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
 
-    if (!response) {
-      reject(new TransactionPollingTimeoutError());
-      return;
-    }
+        if (!response) {
+            throw new TransactionPollingTimeoutError();
+        }
 
-    resolve(response);
-  });
+        return response;
+    })()
 };
