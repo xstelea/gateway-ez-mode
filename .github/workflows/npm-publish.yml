@@ -12,8 +12,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm test
+      # Install pnpm
+      - run: npm install -g pnpm
+
+      # Install dependencies using pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Run tests
+      - run: pnpm test
 
   publish-npm:
     needs: build
@@ -24,8 +30,17 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm run build
-      - run: npm publish --access public
+
+      # Install pnpm
+      - run: npm install -g pnpm
+
+      # Install dependencies
+      - run: pnpm install --frozen-lockfile
+
+      # Build your project
+      - run: pnpm run build
+
+      # Publish to npm
+      - run: pnpm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
