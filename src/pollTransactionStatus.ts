@@ -86,7 +86,10 @@ export const pollTransactionStatus = (
                 transactionId
             );
 
-            if (result.intent_status !== "Pending") {
+            if (result.intent_status !== "Pending"
+                && result.intent_status !== "LikelyButNotCertainRejection"
+                && result.intent_status !== "Unknown"
+            ) {
                 response = result;
                 break;
             }
