@@ -29,7 +29,7 @@ async function createMinimalStokenetTransaction(): Promise<[
     const transactionHeader: TransactionHeader = {
         networkId: NetworkId.Stokenet,
         startEpochInclusive: status.ledger_state.epoch,
-        endEpochExclusive: status.ledger_state.epoch + 1,
+        endEpochExclusive: status.ledger_state.epoch + 5,
         nonce: await generateRandomNonce(),
         notaryIsSignatory: false,
         notaryPublicKey: SOME_RANDOM_SIGNER.publicKey(),
