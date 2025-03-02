@@ -1,7 +1,8 @@
 {
   "name": "@calamari-radix/gateway-ez-mode",
   "version": "1.1.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "lint": "eslint --ext .ts src",
