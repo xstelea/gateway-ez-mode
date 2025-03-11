@@ -86,7 +86,8 @@ describe('transactionPoller', () => {
             const [transaction, intentHash] =
                 await createMinimalStokenetTransaction();
 
-            gateway.gateway.transaction.innerClient.transactionSubmit({
+            // await submitting before polling
+            await gateway.gateway.transaction.innerClient.transactionSubmit({
                 transactionSubmitRequest: {
                     notarized_transaction_hex: transaction,
                 },
