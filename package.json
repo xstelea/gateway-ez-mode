@@ -32,7 +32,7 @@
     "vitest": "^3.0.7"
   },
   "dependencies": {
-    "@radixdlt/babylon-gateway-api-sdk": "^1.9.2"
+    "@radixdlt/babylon-gateway-api-sdk": "^1.10.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
