@@ -100,6 +100,7 @@ export class TransactionStream {
                         detailed_events: true,
                     },
                     limit_per_page: this.batchSize,
+                    transaction_status_filter: 'Success',
                 },
             });
         this.stateVersionManager.setStateVersion(
