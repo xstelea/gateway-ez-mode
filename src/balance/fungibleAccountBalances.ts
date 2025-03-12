@@ -2,12 +2,12 @@ import {
     GatewayApiClient,
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
-import { FungibleResourceBalance } from './types';
+import { FungibleResourceBalance } from '../types';
 import {
     extractStringArrayMetadata,
     extractStringMetadata,
     extractUrlMetadata,
-} from './data_extractors/metadata';
+} from '../data_extractors/metadata';
 
 export async function getFungibleBalancesForAccount(
     gatewayApi: GatewayApiClient,

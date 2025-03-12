@@ -11,7 +11,7 @@ import {
     InstructionsKind,
     Convert,
 } from '@radixdlt/radix-engine-toolkit';
-import { GatewayEzMode } from '.';
+import { GatewayEzMode } from '..';
 import { GatewayApiClient } from '@radixdlt/babylon-gateway-api-sdk';
 import { Duration } from 'luxon';
 
