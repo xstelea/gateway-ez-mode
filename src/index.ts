@@ -11,7 +11,7 @@ import { defaultGatewayClient } from './gatewayClient';
 import {
     TransactionStream,
     TransactionStreamInput,
-} from './stream/transaction-stream';
+} from './stream/transactionStream';
 
 /**
  * A wrapper around the GatewayApiClient that provides
