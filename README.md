@@ -12,7 +12,7 @@ Find it on [NPM](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
 
 # Example usage
 
-Here's an example of a helper that has already been implemented
+## Getting Account balances
 
 ```ts
 const gateway = new GatewayEzMode();
@@ -62,6 +62,18 @@ console.log(nftBalances);
     },
     ...
 */
+```
+
+## Streaming through transactions
+
+```ts
+const gateway = new GatewayEzMode();
+const stream = await gateway.getTransactionStream({
+    startStateVersion: FROM_STATE_VERSION,
+    batchSize: 100,
+});
+let transactions = await stream.next();
+let moreTransactions = await stream.next();
 ```
 
 # How to contribute?
