@@ -1,4 +1,4 @@
-import { StateVersionManager } from './helpers/stateVersionManager';
+import { StateVersionManager } from './stateVersionManager';
 import {
     CommittedTransactionInfo,
     GatewayApiClient,
