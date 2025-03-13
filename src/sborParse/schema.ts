@@ -10,11 +10,14 @@ import { StringSchema } from './schemas/string';
 import { StructDefinition, StructSchema } from './schemas/struct';
 import { ValueSchema } from './schemas/value';
 import { EnumSchema, VariantDefinition } from './schemas/enum'; // Add this import
+import { nonFungibleLocalId } from '@radixdlt/radix-engine-toolkit';
+import { NonFungibleLocalIdSchema } from './schemas/nonfungiblelocalid';
 
 // Schema factory functions
 export const s = {
     decimal: () => new DecimalSchema(),
     string: () => new StringSchema(),
+    nonFungibleLocalId: () => new NonFungibleLocalIdSchema(),
     number: () => new NumberSchema(),
     resourceAddress: () => new ResourceAddressSchema(),
     struct: <T extends StructDefinition>(definition: T) =>

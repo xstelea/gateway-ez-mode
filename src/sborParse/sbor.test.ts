@@ -85,16 +85,7 @@ describe('boing', () => {
             {
                 variant: 'ContainsOption',
                 schema: s.struct({
-                    option: s.enum([
-                        {
-                            variant: 'None',
-                            schema: s.tuple([]),
-                        },
-                        {
-                            variant: 'Some',
-                            schema: s.tuple([s.string()]),
-                        },
-                    ]),
+                    option: s.option(s.string()),
                 }),
             },
         ]);
