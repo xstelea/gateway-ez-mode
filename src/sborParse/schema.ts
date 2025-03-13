@@ -4,7 +4,7 @@ import { ArraySchema } from './schemas/array';
 import { BoolSchema } from './schemas/bool';
 import { DecimalSchema } from './schemas/decimal';
 import { NumberSchema } from './schemas/number';
-import { OrderedTupleSchema } from './schemas/orderedTuple';
+import { OrderedTupleSchema, TupleSchema } from './schemas/orderedTuple';
 import { ResourceAddressSchema } from './schemas/resourceAddress';
 import { StringSchema } from './schemas/string';
 import { StructDefinition, StructSchema } from './schemas/struct';
@@ -29,8 +29,9 @@ export const s = {
     value: () => new ValueSchema(),
     // Add enum factory method
     enum: <
-        S extends StructSchema<any> | OrderedTupleSchema<unknown>,
         const T extends VariantDefinition<S>[],
+        S extends StructSchema<any> | OrderedTupleSchema<B>,
+        B extends TupleSchema,
     >(
         variants: T
     ): EnumSchema<T> => new EnumSchema(variants),

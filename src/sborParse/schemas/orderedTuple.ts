@@ -4,9 +4,9 @@ import {
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborError, SborSchema } from '../sborSchema';
 
-export class OrderedTupleSchema<
-    T extends SborSchema<unknown, unknown>[],
-> extends SborSchema<
+export type TupleSchema = SborSchema<unknown, unknown>[];
+
+export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<
     { [K in keyof T]: T[K] extends SborSchema<infer U, unknown> ? U : never },
     { [K in keyof T]: T[K] extends SborSchema<unknown, infer O> ? O : never }
 > {
