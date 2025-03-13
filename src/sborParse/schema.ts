@@ -5,12 +5,15 @@ import { BoolSchema } from './schemas/bool';
 import { DecimalSchema } from './schemas/decimal';
 import { NumberSchema } from './schemas/number';
 import { OrderedTupleSchema, TupleSchema } from './schemas/orderedTuple';
-import { ResourceAddressSchema } from './schemas/resourceAddress';
+import { AddressSchema } from './schemas/address';
 import { StringSchema } from './schemas/string';
 import { StructDefinition, StructSchema } from './schemas/struct';
 import { ValueSchema } from './schemas/value';
 import { EnumSchema, VariantDefinition } from './schemas/enum'; // Add this import
 import { NonFungibleLocalIdSchema } from './schemas/nonfungiblelocalid';
+import { MapDefinition, MapSchema } from './schemas/map';
+import { InternalAddressSchema } from './schemas/internalAddress';
+import { InstantSchema } from './schemas/instant';
 
 // Schema factory functions
 export const s = {
@@ -18,7 +21,9 @@ export const s = {
     string: () => new StringSchema(),
     nonFungibleLocalId: () => new NonFungibleLocalIdSchema(),
     number: () => new NumberSchema(),
-    resourceAddress: () => new ResourceAddressSchema(),
+    instant: () => new InstantSchema(),
+    address: () => new AddressSchema(),
+    internalAddress: () => new InternalAddressSchema(),
     struct: <T extends StructDefinition>(definition: T) =>
         new StructSchema(definition),
     tuple: <const T extends SborSchema<any>[]>(schemas: T) =>
@@ -47,4 +52,6 @@ export const s = {
                 schema: s.tuple([itemSchema]),
             },
         ]),
+    map: <T extends MapDefinition>(definition: T) =>
+        new MapSchema<T>(definition),
 };

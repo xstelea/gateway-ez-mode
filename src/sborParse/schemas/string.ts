@@ -7,7 +7,7 @@ export class StringSchema extends SborSchema<string> {
     }
 
     validate(value: ProgrammaticScryptoSborValue, path: string[]): boolean {
-        if (value.kind !== 'String') {
+        if (value.kind !== 'String' || typeof value.value !== 'string') {
             throw new SborError('Invalid string', path);
         }
         return true;
