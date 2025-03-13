@@ -2,13 +2,13 @@ import {
     GatewayApiClient,
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
-import { NftBalance, ResourceInfo } from './types';
+import { NftBalance, ResourceInfo } from '../types';
 import {
     extractStringArrayMetadata,
     extractStringMetadata,
     extractUrlMetadata,
-} from './data_extractors/metadata';
-import { extractStringNftData } from './data_extractors/nftData';
+} from '../data_extractors/metadata';
+import { extractStringNftData } from '../data_extractors/nftData';
 
 export async function getNonFungibleBalancesForAccount(
     gatewayApi: GatewayApiClient,

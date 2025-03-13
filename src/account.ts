@@ -1,7 +1,8 @@
 import { GatewayApiClient } from '@radixdlt/babylon-gateway-api-sdk';
 import { FungibleResourceBalance, NftBalance } from './types';
-import { getFungibleBalancesForAccount } from './fungibleAccountBalances';
-import { getNonFungibleBalancesForAccount } from './nftBalances';
+import { getFungibleBalancesForAccount } from './balance/fungibleAccountBalances';
+import { getNonFungibleBalancesForAccount } from './balance/nftBalances';
+import { defaultGatewayClient } from './gatewayClient';
 
 /**
  * Represents a Radix Account.
@@ -18,10 +19,7 @@ export class Account {
      */
     constructor(
         address: string,
-        gateway: GatewayApiClient = GatewayApiClient.initialize({
-            applicationName: '',
-            networkId: 1,
-        })
+        gateway: GatewayApiClient = defaultGatewayClient()
     ) {
         this.gateway = gateway;
         this.address = address;

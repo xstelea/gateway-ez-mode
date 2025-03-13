@@ -6,7 +6,12 @@ import { Account } from './account';
 import {
     PollTransactionStatusOptions,
     pollTransactionStatus,
-} from './pollTransactionStatus';
+} from './transactionStatus/pollTransactionStatus';
+import { defaultGatewayClient } from './gatewayClient';
+import {
+    TransactionStream,
+    TransactionStreamInput,
+} from './stream/transactionStream';
 
 /**
  * A wrapper around the GatewayApiClient that provides
@@ -27,10 +32,7 @@ export class GatewayEzMode {
         if (gateway) {
             this.gateway = gateway;
         } else {
-            this.gateway = GatewayApiClient.initialize({
-                applicationName: '',
-                networkId: 1,
-            });
+            this.gateway = defaultGatewayClient();
         }
     }
 
@@ -47,7 +49,7 @@ export class GatewayEzMode {
      * Poll the status of a transaction until it is in a 'final' state, either failed or succeeded.
      * @param transactionId The transaction id / intent hash of the transaction to poll.
      * @param options Options for polling.
-     * @returns A promise that resolves ∑ith the transaction
+     * @returns A promise that resolves with the transaction
      * status as soon as the transaction is in a final state.
      *
      * @example
@@ -69,6 +71,23 @@ export class GatewayEzMode {
         return pollTransactionStatus(transactionId, {
             ...(options || {}),
             gatewayApiClient: this.gateway,
+        });
+    }
+
+    /**
+     *
+     * @param startStateVersion The state version to start streaming from.
+     * @param batchSize The maximum number of transactions to fetch per call.
+     * @returns A promise that resolves with a TransactionStream class instance.
+     */
+    async getTransactionStream({
+        startStateVersion,
+        batchSize,
+    }: Partial<TransactionStreamInput>): Promise<TransactionStream> {
+        return TransactionStream.create({
+            gateway: this.gateway,
+            startStateVersion,
+            batchSize,
         });
     }
 }

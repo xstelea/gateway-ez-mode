@@ -2,6 +2,7 @@ import {
     GatewayApiClient,
     TransactionStatusResponse,
 } from '@radixdlt/babylon-gateway-api-sdk';
+import { defaultGatewayClient } from '../gatewayClient';
 
 export class TransactionPollingError extends Error {
     constructor(message: string) {
@@ -59,10 +60,7 @@ export const pollTransactionStatus = (
         maxDelay = 10000,
         delayFn = (retry: number) =>
             Math.min(baseDelay * Math.pow(2, retry), maxDelay),
-        gatewayApiClient = GatewayApiClient.initialize({
-            applicationName: '',
-            networkId: 1,
-        }),
+        gatewayApiClient = defaultGatewayClient(),
     } = options || {};
 
     return (async () => {

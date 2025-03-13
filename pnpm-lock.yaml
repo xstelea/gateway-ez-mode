@@ -8,8 +8,8 @@ importers:
   .:
     dependencies:
       '@radixdlt/babylon-gateway-api-sdk':
-        specifier: ^1.9.2
-        version: 1.9.2
+        specifier: ^1.10.0
+        version: 1.10.1
     devDependencies:
       '@eslint/js':
         specifier: ^9.21.0
@@ -406,10 +406,10 @@ packages:
       }
     engines: { node: '>= 8' }
 
-  '@radixdlt/babylon-gateway-api-sdk@1.9.2':
+  '@radixdlt/babylon-gateway-api-sdk@1.10.1':
     resolution:
       {
-        integrity: sha512-AgAqNMKpqlHKfm/NRaYMKOObmAihXCNPDqGUH4/w6kFBQnWl4DAcITUinJDoW5QubdU+qW+awhUiYQfLj3Uxqg==,
+        integrity: sha512-l/Pt1qaxi2I99ykl9oS4pO+AzBmpMY6oqMOBq0ABbpg7YqqaugZU3OUP/tI0SQsIR1QvXYGdxlsS+HnhioeHlA==,
       }
 
   '@radixdlt/radix-engine-toolkit@1.0.5':
@@ -1983,7 +1983,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@radixdlt/babylon-gateway-api-sdk@1.9.2': {}
+  '@radixdlt/babylon-gateway-api-sdk@1.10.1': {}
 
   '@radixdlt/radix-engine-toolkit@1.0.5':
     dependencies:
