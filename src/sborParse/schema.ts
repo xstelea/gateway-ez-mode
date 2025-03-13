@@ -19,21 +19,21 @@ export const s = {
     resourceAddress: () => new ResourceAddressSchema(),
     struct: <T extends StructDefinition>(definition: T) =>
         new StructSchema(definition),
-    tuple: <const T extends SborSchema<unknown, unknown>[]>(schemas: T) =>
+    tuple: <const T extends SborSchema<any>[]>(schemas: T) =>
         new OrderedTupleSchema(schemas),
-    array: <T extends SborSchema<unknown, unknown>>(itemSchema: T) =>
+    array: <T extends SborSchema<any, any>>(itemSchema: T) =>
         new ArraySchema<T>(itemSchema),
     bool: () => new BoolSchema(),
     value: () => new ValueSchema(),
     // Add enum factory method
     enum: <
-        S extends StructSchema<any> | OrderedTupleSchema<any>,
+        S extends StructSchema<any> | OrderedTupleSchema<unknown>,
         const T extends VariantDefinition<S>[],
     >(
         variants: T
     ): EnumSchema<T> => new EnumSchema(variants),
     // option is an enum with two variants: None and Some
-    option: <T extends SborSchema<unknown>>(itemSchema: T) =>
+    option: <T extends SborSchema<any>>(itemSchema: T) =>
         s.enum([
             {
                 variant: 'None',
