@@ -610,7 +610,6 @@ describe('boing', () => {
                     kind: 'Tuple',
                     fields: [
                         {
-                            // name: 'A mighty struct indeed'
                             field_name: 'name',
                             kind: 'String',
                             value: 'A mighty struct indeed',
@@ -625,12 +624,10 @@ describe('boing', () => {
                                     // Each element is a Tuple
                                     kind: 'Tuple',
                                     fields: [
-                                        // s.decimal() -> let's pick Decimal(42.1234)
                                         {
                                             kind: 'Decimal',
                                             value: '42.1234',
                                         },
-                                        // s.enum -> either 'Empty' or 'StructBased'
                                         {
                                             kind: 'Enum',
                                             variant_id: '1',
@@ -655,7 +652,6 @@ describe('boing', () => {
                                     ],
                                 },
                                 {
-                                    // Another element in the complicated_array
                                     kind: 'Tuple',
                                     fields: [
                                         {
@@ -663,7 +659,6 @@ describe('boing', () => {
                                             value: '0.0001',
                                         },
                                         {
-                                            // The empty variant
                                             kind: 'Enum',
                                             variant_id: '0',
                                             variant_name: 'Empty',
@@ -679,7 +674,7 @@ describe('boing', () => {
                         },
                     ],
                 },
-                // The array of enums portion
+                // Array of enums portion
                 {
                     kind: 'Array',
                     type_name: 'Array',
