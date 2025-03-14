@@ -5,7 +5,7 @@ import {
     ProgrammaticScryptoSborValueTuple,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborError, SborSchema } from '../sborSchema';
-import { OutputType, ParsedType, StructSchema } from './struct'; // Assuming you have this from your previous code
+import { ParsedType, StructSchema } from './struct'; // Assuming you have this from your previous code
 import { OrderedTupleSchema } from './orderedTuple'; // Assuming you have this from your previous code
 
 export interface VariantDefinition<
@@ -23,13 +23,6 @@ type VariantParsedType<T extends VariantDefinition<any>> =
           ? { [K in keyof U]: ParsedType<U[K]> }
           : never;
 
-type VariantOutputType<T extends VariantDefinition<any>> =
-    T['schema'] extends StructSchema<infer U>
-        ? { [K in keyof U]: OutputType<U[K]> }
-        : T['schema'] extends OrderedTupleSchema<infer U>
-          ? { [K in keyof U]: OutputType<U[K]> }
-          : never;
-
 export type EnumParsedType<T extends VariantDefinition<any>[]> = {
     [K in keyof T]: T[K] extends VariantDefinition<infer S>
         ? S extends StructSchema<any>
@@ -43,32 +36,10 @@ export type EnumParsedType<T extends VariantDefinition<any>[]> = {
         : never;
 }[number];
 
-// Similar approach for output type.
-export type EnumOutputType<T extends VariantDefinition<any>[]> = {
-    [K in keyof T]: T[K] extends VariantDefinition<infer S>
-        ? S extends StructSchema<any>
-            ? {
-                  variant: T[K]['variant'];
-                  value: VariantOutputType<T[K]>;
-              }
-            : S extends OrderedTupleSchema<any>
-              ? { variant: T[K]['variant']; value: VariantOutputType<T[K]> }
-              : never
-        : never;
-}[number];
-
 export class EnumSchema<T extends VariantDefinition<any>[]> extends SborSchema<
     {
         [K in keyof T]: T[K] extends VariantDefinition<any>
             ? { variant: T[K]['variant']; value: VariantParsedType<T[K]> }
-            : never;
-    }[number],
-    {
-        [K in keyof T]: T[K] extends VariantDefinition<any>
-            ? {
-                  variant: T[K]['variant'];
-                  value: VariantOutputType<T[K]>;
-              }
             : never;
     }[number]
 > {

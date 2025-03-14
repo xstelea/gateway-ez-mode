@@ -405,11 +405,11 @@ describe('boing', () => {
             { variant: 'TupleBasedEmpty', value: [] },
             {
                 variant: 'ContainsOption',
-                value: { option: { variant: 'None', value: [] } },
+                value: { option: { variant: 'None', value: null } },
             },
             {
                 variant: 'ContainsOption',
-                value: { option: { variant: 'Some', value: ['daan'] } },
+                value: { option: { variant: 'Some', value: 'daan' } },
             },
         ];
 
@@ -442,7 +442,7 @@ describe('boing', () => {
 
         const parsed = {
             variant: 'None',
-            value: [],
+            value: null,
         };
 
         const schema = s.option(s.string());
@@ -456,18 +456,38 @@ describe('boing', () => {
             variant_name: 'Some',
             fields: [
                 {
-                    kind: 'String',
-                    value: 'hello',
+                    kind: 'Tuple',
+                    fields: [
+                        {
+                            kind: 'String',
+                            value: 'hello',
+                            field_name: 'boing',
+                        },
+                    ],
                 },
             ],
         };
 
         const parsed = {
             variant: 'Some',
-            value: ['hello'],
+            value: {
+                boing: 'hello',
+            },
         };
 
-        const schema = s.option(s.string());
+        const schema = s.option(
+            s.struct({
+                boing: s.string(),
+            })
+        );
+        const result = schema.safeParse(example);
+        if (result.success) {
+            console.log(result.data);
+            expect(result.data).toEqual(parsed);
+        } else {
+            console.error(result.error);
+            throw new Error('Failed to parse');
+        }
         evaluateResultHelper(schema, example, parsed);
     });
 
@@ -656,7 +676,6 @@ describe('boing', () => {
             ],
         };
 
-        // 3) The expected parsed value once `schema` decodes everything
         const expectedParsedValue = [
             {
                 name: 'A mighty struct indeed',

@@ -6,10 +6,9 @@ import { SborError, SborSchema } from '../sborSchema';
 
 export type TupleSchema = SborSchema<unknown, unknown>[];
 
-export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<
-    { [K in keyof T]: T[K] extends SborSchema<infer U, unknown> ? U : never },
-    { [K in keyof T]: T[K] extends SborSchema<unknown, infer O> ? O : never }
-> {
+export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<{
+    [K in keyof T]: T[K] extends SborSchema<infer U, unknown> ? U : never;
+}> {
     private schemas: T;
 
     constructor(schemas: T) {

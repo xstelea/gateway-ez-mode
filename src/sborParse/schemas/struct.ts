@@ -11,13 +11,10 @@ export interface StructDefinition {
 
 export type ParsedType<T extends SborSchema<unknown>> =
     T extends SborSchema<infer U, unknown> ? U : never;
-export type OutputType<T extends SborSchema<unknown>> =
-    T extends SborSchema<unknown, infer O> ? O : never;
 
-export class StructSchema<T extends StructDefinition> extends SborSchema<
-    { [K in keyof T]: ParsedType<T[K]> },
-    { [K in keyof T]: OutputType<T[K]> }
-> {
+export class StructSchema<T extends StructDefinition> extends SborSchema<{
+    [K in keyof T]: ParsedType<T[K]>;
+}> {
     private definition: T;
 
     constructor(definition: T) {

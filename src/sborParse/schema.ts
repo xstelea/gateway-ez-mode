@@ -14,6 +14,7 @@ import { NonFungibleLocalIdSchema } from './schemas/nonfungiblelocalid';
 import { MapDefinition, MapSchema } from './schemas/map';
 import { InternalAddressSchema } from './schemas/internalAddress';
 import { InstantSchema } from './schemas/instant';
+import { OptionSchema } from './schemas/option';
 
 // Schema factory functions
 export const s = {
@@ -40,18 +41,8 @@ export const s = {
     >(
         variants: T
     ): EnumSchema<T> => new EnumSchema(variants),
-    // option is an enum with two variants: None and Some
     option: <T extends SborSchema<any>>(itemSchema: T) =>
-        s.enum([
-            {
-                variant: 'None',
-                schema: s.tuple([]),
-            },
-            {
-                variant: 'Some',
-                schema: s.tuple([itemSchema]),
-            },
-        ]),
+        new OptionSchema(itemSchema),
     map: <T extends MapDefinition>(definition: T) =>
         new MapSchema<T>(definition),
 };

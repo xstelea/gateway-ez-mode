@@ -3,11 +3,11 @@ import {
     ProgrammaticScryptoSborValueArray,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborError, SborSchema } from '../sborSchema';
-import { OutputType, ParsedType } from './struct';
+import { ParsedType } from './struct';
 
 export class ArraySchema<
     T extends SborSchema<unknown, unknown>,
-> extends SborSchema<ParsedType<T>[], OutputType<T>[]> {
+> extends SborSchema<ParsedType<T>[]> {
     private itemSchema: T;
 
     constructor(itemSchema: T) {
