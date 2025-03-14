@@ -91,5 +91,4 @@ export class GatewayEzMode {
         });
     }
 }
-export { SborParser } from './sborParse/parser';
-export { s } from './sborParse/schema';
+export { s } from './sborParse/factory';
