@@ -12,7 +12,6 @@ export class OptionSchema<T extends SborSchema<any>> extends SborSchema<
       }
     | {
           variant: 'None';
-          value: null;
       }
 > {
     private innerSchema: T;
@@ -58,12 +57,11 @@ export class OptionSchema<T extends SborSchema<any>> extends SborSchema<
           }
         | {
               variant: 'None';
-              value: null;
           } {
         this.validate(value, path);
         const enumValue = value as ProgrammaticScryptoSborValueEnum;
         if (enumValue.variant_name === 'None') {
-            return { variant: 'None', value: null };
+            return { variant: 'None' };
         } else {
             return {
                 variant: 'Some',

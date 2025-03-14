@@ -405,7 +405,7 @@ describe('boing', () => {
             { variant: 'TupleBasedEmpty', value: [] },
             {
                 variant: 'ContainsOption',
-                value: { option: { variant: 'None', value: null } },
+                value: { option: { variant: 'None' } },
             },
             {
                 variant: 'ContainsOption',
@@ -442,7 +442,6 @@ describe('boing', () => {
 
         const parsed = {
             variant: 'None',
-            value: null,
         };
 
         const schema = s.option(s.string());
