@@ -55,21 +55,59 @@ describe('boing', () => {
     });
 
     it('parse a struct', () => {
-        const schema = s.struct({
+        const example: ProgrammaticScryptoSborValue = {
+            fields: [
+                {
+                    value: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+                    kind: 'Reference',
+                    type_name: 'ResourceAddress',
+                    field_name: 'input_address',
+                },
+                {
+                    value: '0.003427947474666592',
+                    kind: 'Decimal',
+                    field_name: 'input_amount',
+                },
+                {
+                    value: 'resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd',
+                    kind: 'Reference',
+                    type_name: 'ResourceAddress',
+                    field_name: 'output_address',
+                },
+                {
+                    value: '522.23800528105807128',
+                    kind: 'Decimal',
+                    field_name: 'output_amount',
+                },
+                {
+                    field_name: 'is_success',
+                    kind: 'Bool',
+                    value: true,
+                },
+            ],
+            kind: 'Tuple',
+            type_name: 'SwapEvent',
+        };
+
+        const swapEventSchema = s.struct({
             input_address: s.address(),
             input_amount: s.decimal(),
             output_address: s.address(),
             output_amount: s.decimal(),
-            bool_field: s.bool(),
+            is_success: s.bool(),
         });
 
-        const result = schema.safeParse(swapEvent);
-        if (result.success) {
-            console.log(result.data);
-            // result.data
-        }
+        const parsed = {
+            input_address:
+                'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+            input_amount: '0.003427947474666592',
+            output_address:
+                'resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd',
+            output_amount: '522.23800528105807128',
+            is_success: true,
+        };
 
-        console.log(JSON.stringify(result, null, 2));
+        evaluateResultHelper(swapEventSchema, example, parsed);
     });
 
     it('parse an enum', () => {

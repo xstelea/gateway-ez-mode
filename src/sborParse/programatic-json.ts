@@ -740,45 +740,6 @@ export const complex: ProgrammaticScryptoSborValue = {
     type_name: 'EventPairUpdates',
 };
 
-export const swapEvent: ProgrammaticScryptoSborValue = {
-    fields: [
-        {
-            value: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
-            kind: 'Reference',
-            type_name: 'ResourceAddress',
-            field_name: 'input_address',
-        },
-        {
-            value: '0.003427947474666592',
-            kind: 'Decimal',
-            field_name: 'input_amount',
-        },
-        {
-            value: 'resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd',
-            kind: 'Reference',
-            type_name: 'ResourceAddress',
-            field_name: 'output_address',
-        },
-        {
-            value: '522.23800528105807128',
-            kind: 'Decimal',
-            field_name: 'output_amount',
-        },
-        {
-            value: '0.000000000000000000',
-            kind: 'Decimal',
-            field_name: 'input_fee_lp',
-        },
-        {
-            field_name: 'bool_field',
-            kind: 'Bool',
-            value: true,
-        },
-    ],
-    kind: 'Tuple',
-    type_name: 'SwapEvent',
-};
-
 export const _enum = {
     variant_id: '1',
     variant_name: 'NonFungible',
