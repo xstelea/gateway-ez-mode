@@ -179,6 +179,305 @@ if (result.success) {
 
 So now we managed to go from this huge JSON representation to an easy to use, pretty object representation.
 
+### Parsing tuples
+
+Rust type:
+
+```rust
+(String, u32)
+```
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Tuple',
+    field_name: 'tuple',
+    type_name: 'tuple',
+    fields: [
+        {
+            kind: 'String',
+            value: 'hello',
+        },
+        {
+            kind: 'U32',
+            value: '5',
+        },
+    ],
+};
+const schema = s.tuple([s.string(), s.number()]);
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// ['hello', 5];
+```
+
+## Parsing enums
+
+The corresponding Rust type:
+
+```rust
+enum MyEnum {
+    NonFungible {
+        ids: Vec<NonFungibleLocalId>,
+        resource_address: ResourceAddress,
+    },
+    Fungible(Decimal),
+}
+```
+
+To parse enums, you will have to provide the `enum` schema constructor with an array of variant definitions. The schema passed to `schema` _must_ be either a struct or a tuple schema, but of course it can then contain any other schema. The result will have the nice type inference you would expect, meeaning you can do type narrowing on the result to figure out which variant was parsed and act accordingly.
+
+```ts
+const myEnumSchema = s.enum([
+    {
+        variant: 'NonFungible',
+        schema: s.struct({
+            ids: s.array(s.nonFungibleLocalId()),
+            resource_address: s.address(),
+        }),
+    },
+    { variant: 'Fungible', schema: s.tuple([s.decimal()]) },
+]);
+```
+
+In the case of a `NonFungible` variant, the programmatic JSON might look like this:
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Enum',
+    variant_id: '0',
+    variant_name: 'NonFungible',
+    fields: [
+        {
+            kind: 'Array',
+            field_name: 'ids',
+            values: [
+                {
+                    kind: 'NonFungibleLocalId',
+                    value: '#1#',
+                },
+            ],
+        },
+        {
+            kind: 'Reference',
+            field_name: 'resource_address',
+            value: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+        },
+    ],
+};
+```
+
+Now we can parse this programmatic JSON into our nice schema:
+
+```ts
+const result = myEnumSchema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// {
+//     variant: 'NonFungible',
+//     value: {
+//         ids: ['#1#'],
+//         resource_address: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+//     },
+// }
+```
+
+### Parsing arrays
+
+Rust type:
+
+```rust
+Vec<u32>
+```
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Array',
+    field_name: 'nft_ids',
+    type_name: 'Array',
+    element_kind: 'NonFungibleLocalId',
+    elements: [
+        {
+            kind: 'NonFungibleLocalId',
+            value: '#1#',
+        },
+        {
+            kind: 'NonFungibleLocalId',
+            value: '#2#',
+        },
+        {
+            kind: 'NonFungibleLocalId',
+            value: '#3#',
+        },
+    ],
+};
+const schema = s.array(s.nonFungibleLocalId());
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// ['#1#', '#2#', '#3#'];
+```
+
+### Parsing maps
+
+Rust type:
+
+```rust
+HashMap<String, String>
+```
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Map',
+    field_name: 'map',
+    key_kind: 'String',
+    value_kind: 'String',
+    entries: [
+        {
+            key: {
+                kind: 'String',
+                value: 'boinoing',
+            },
+            value: {
+                kind: 'String',
+                value: 'boobies',
+            },
+        },
+        {
+            key: {
+                kind: 'String',
+                value: 'impostor',
+            },
+            value: {
+                kind: 'String',
+                value: 'amogus',
+            },
+        },
+    ],
+};
+```
+
+```ts
+const schema = s.map({
+    key: s.string(),
+    value: s.string(),
+});
+
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// Map(2) { 'boinoing' => 'boobies', 'impostor' => 'amogus' }
+```
+
+### Parsing a tuple
+
+Rust type:
+
+```rust
+(String, u32)
+```
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Tuple',
+    field_name: 'tuple',
+    type_name: 'tuple',
+    fields: [
+        {
+            kind: 'String',
+            value: 'hello',
+        },
+        {
+            kind: 'U32',
+            value: '5',
+        },
+    ],
+};
+
+const schema = s.tuple([s.string(), s.number()]);
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// ['hello', 5];
+```
+
+### Using the option utility enum
+
+The `option` utility enum is a special enum schema that can be used to represent optional values. It has two variants: `Some` and `None`.
+
+The corresponding Rust type:
+
+```rust
+Option<u32>
+```
+
+Example of parsing a `None`:
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Enum',
+    variant_id: '0',
+    variant_name: 'None',
+    fields: [],
+};
+
+const schema = s.option(s.string());
+
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// { variant: 'None' }
+```
+
+Example of parsing a `Some`:
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Enum',
+    variant_id: '1',
+    variant_name: 'Some',
+    fields: [
+        {
+            kind: 'Tuple',
+            fields: [
+                {
+                    kind: 'U32',
+                    value: 'hello',
+                    field_name: 'boing',
+                },
+            ],
+        },
+    ],
+};
+
+const schema = s.option(s.bool());
+
+const result = schema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// { variant: 'Some', value: true }
+```
+
 # How to contribute?
 
 To prevent wasted time, it would be best to first create an issue describing your idea. If you don't care to wait for my response, it would also be fine to just create a pull request and I wil review it.
@@ -186,3 +485,19 @@ To prevent wasted time, it would be best to first create an issue describing you
 Please add some kind of tests for your helper to `index.test.ts` or any new `*.test.ts` file. Tests are automatically run inside of pull requests.
 
 To run all tests locally, run `npm run test`
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
