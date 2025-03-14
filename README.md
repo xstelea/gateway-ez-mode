@@ -167,7 +167,6 @@ const result = swapEventSchema.safeParse(example);
 if (result.success) {
     console.log(result.data);
 }
-
 // {
 //     input_address: 'resource_rdx1t5py...',
 //     input_amount: '0.003427947474666592',
@@ -178,114 +177,6 @@ if (result.success) {
 ```
 
 So now we managed to go from this huge JSON representation to an easy to use, pretty object representation.
-
-### Parsing tuples
-
-Rust type:
-
-```rust
-(String, u32)
-```
-
-```ts
-const example: ProgrammaticScryptoSborValue = {
-    kind: 'Tuple',
-    field_name: 'tuple',
-    type_name: 'tuple',
-    fields: [
-        {
-            kind: 'String',
-            value: 'hello',
-        },
-        {
-            kind: 'U32',
-            value: '5',
-        },
-    ],
-};
-const schema = s.tuple([s.string(), s.number()]);
-const result = schema.safeParse(example);
-
-if (result.success) {
-    console.log(result.data);
-}
-
-// ['hello', 5];
-```
-
-## Parsing enums
-
-The corresponding Rust type:
-
-```rust
-enum MyEnum {
-    NonFungible {
-        ids: Vec<NonFungibleLocalId>,
-        resource_address: ResourceAddress,
-    },
-    Fungible(Decimal),
-}
-```
-
-To parse enums, you will have to provide the `enum` schema constructor with an array of variant definitions. The schema passed to `schema` _must_ be either a struct or a tuple schema, but of course it can then contain any other schema. The result will have the nice type inference you would expect, meeaning you can do type narrowing on the result to figure out which variant was parsed and act accordingly.
-
-```ts
-const myEnumSchema = s.enum([
-    {
-        variant: 'NonFungible',
-        schema: s.struct({
-            ids: s.array(s.nonFungibleLocalId()),
-            resource_address: s.address(),
-        }),
-    },
-    { variant: 'Fungible', schema: s.tuple([s.decimal()]) },
-]);
-```
-
-In the case of a `NonFungible` variant, the programmatic JSON might look like this:
-
-```ts
-const example: ProgrammaticScryptoSborValue = {
-    kind: 'Enum',
-    variant_id: '0',
-    variant_name: 'NonFungible',
-    fields: [
-        {
-            kind: 'Array',
-            field_name: 'ids',
-            values: [
-                {
-                    kind: 'NonFungibleLocalId',
-                    value: '#1#',
-                },
-            ],
-        },
-        {
-            kind: 'Reference',
-            field_name: 'resource_address',
-            value: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
-        },
-    ],
-};
-```
-
-Now we can parse this programmatic JSON into our nice schema:
-
-```ts
-const result = myEnumSchema.safeParse(example);
-
-if (result.success) {
-    console.log(result.data);
-}
-
-// {
-//     variant: 'NonFungible',
-//     value: {
-//         ids: ['#1#'],
-//         resource_address: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
-//     },
-// }
-```
 
 ### Parsing arrays
 
@@ -413,6 +304,80 @@ if (result.success) {
 }
 
 // ['hello', 5];
+```
+
+## Parsing enums
+
+The corresponding Rust type:
+
+```rust
+enum MyEnum {
+    NonFungible {
+        ids: Vec<NonFungibleLocalId>,
+        resource_address: ResourceAddress,
+    },
+    Fungible(Decimal),
+}
+```
+
+To parse enums, you will have to provide the `enum` schema constructor with an array of variant definitions. The schema passed to `schema` _must_ be either a struct or a tuple schema, but of course it can then contain any other schema. The result will have the nice type inference you would expect, meeaning you can do type narrowing on the result to figure out which variant was parsed and act accordingly.
+
+```ts
+const myEnumSchema = s.enum([
+    {
+        variant: 'NonFungible',
+        schema: s.struct({
+            ids: s.array(s.nonFungibleLocalId()),
+            resource_address: s.address(),
+        }),
+    },
+    { variant: 'Fungible', schema: s.tuple([s.decimal()]) },
+]);
+```
+
+In the case of a `NonFungible` variant, the programmatic JSON might look like this:
+
+```ts
+const example: ProgrammaticScryptoSborValue = {
+    kind: 'Enum',
+    variant_id: '0',
+    variant_name: 'NonFungible',
+    fields: [
+        {
+            kind: 'Array',
+            field_name: 'ids',
+            values: [
+                {
+                    kind: 'NonFungibleLocalId',
+                    value: '#1#',
+                },
+            ],
+        },
+        {
+            kind: 'Reference',
+            field_name: 'resource_address',
+            value: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+        },
+    ],
+};
+```
+
+Now we can parse this programmatic JSON into our nice schema:
+
+```ts
+const result = myEnumSchema.safeParse(example);
+
+if (result.success) {
+    console.log(result.data);
+}
+
+// {
+//     variant: 'NonFungible',
+//     value: {
+//         ids: ['#1#'],
+//         resource_address: 'resource_rdx1t5pyvlaas0ljxy0wytm5gvyamyv896m69njqdmm2stukr3xexc2up9',
+//     },
+// }
 ```
 
 ### Using the option utility enum
