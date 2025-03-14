@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it } from 'vitest';
-import { boingEvents, complex, swapEvent } from './programatic-json';
+import { boingEvents, complex } from './programatic-json';
 import { s } from './factory';
 import { ProgrammaticScryptoSborValue } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborSchema } from './sborSchema';
