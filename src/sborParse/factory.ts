@@ -181,13 +181,7 @@ export const s = {
      * ```ts
      * const myMapSchema = s.map({ key: s.string(), value: s.number() });
      * ```
-     * Parsing a map will give back an array of key-value pairs:
-     * ```json
-     * [
-     *  { key: "foo", value: 123 },
-     *  { key: "bar", value: 456 },
-     * ]
-     * ```
+     * Parsing a map will give back an Map object with the keys and values parsed according to the schema.
      */
     map: <T extends MapDefinition>(definition: T) =>
         new MapSchema<T>(definition),

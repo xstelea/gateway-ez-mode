@@ -11,16 +11,19 @@ export interface MapDefinition {
     value: SborSchema<any, any>;
 }
 
+// export type MapDefinition = Map<any, any>
+
 export type MapParsedType<T extends MapDefinition> = {
     key: ParsedType<T['key']>;
     value: ParsedType<T['value']>;
 };
 
 export class MapSchema<T extends MapDefinition> extends SborSchema<
-    {
-        key: ParsedType<T['key']>;
-        value: ParsedType<T['value']>;
-    }[]
+    // {
+    //     key: ParsedType<T['key']>;
+    //     value: ParsedType<T['value']>;
+    // }[]
+    Map<ParsedType<T['key']>, ParsedType<T['value']>>
 > {
     private definition: T;
 
@@ -65,20 +68,22 @@ export class MapSchema<T extends MapDefinition> extends SborSchema<
     parse(
         value: ProgrammaticScryptoSborValue,
         path: string[]
-    ): MapParsedType<T>[] {
+    ): Map<ParsedType<T['key']>, ParsedType<T['value']>> {
         this.validate(value, path);
         const mapValue = value as ProgrammaticScryptoSborValueMap;
         const entries = mapValue.entries;
 
-        return entries.map((entry, index) => ({
-            key: this.definition.key.parse(entry.key, [
-                ...path,
-                index.toString(),
-            ]),
-            value: this.definition.value.parse(entry.value, [
-                ...path,
-                index.toString(),
-            ]),
-        }));
+        return new Map(
+            entries.map((entry, index) => [
+                this.definition.key.parse(entry.key, [
+                    ...path,
+                    index.toString(),
+                ]),
+                this.definition.value.parse(entry.value, [
+                    ...path,
+                    index.toString(),
+                ]),
+            ])
+        );
     }
 }

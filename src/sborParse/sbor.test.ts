@@ -12,7 +12,7 @@ function evaluateResultHelper<S extends SborSchema<any>, E>(
 ) {
     const result = schema.safeParse(example);
     if (result.success) {
-        console.log(result.data);
+        // console.log(result.data);
         expect(result.data).toEqual(expectedParsedValue);
     } else {
         console.error(result.error);
@@ -44,14 +44,14 @@ describe('boing', () => {
         const result = schema.safeParse(complex);
 
         if (result.success) {
-            result.data.updates.forEach((update) => {
-                console.log(update[1]);
-            });
+            // result.data.updates.forEach((update) => {
+            //     console.log(update[1]);
+            // });
         } else {
             throw new Error('Failed to parse');
         }
 
-        console.log(JSON.stringify(result, null, 2));
+        // console.log(JSON.stringify(result, null, 2));
     });
 
     it('parse a struct', () => {
@@ -159,20 +159,23 @@ describe('boing', () => {
                 },
             ],
         };
-        const parsed = [
-            {
-                key: 'boinoing',
-                value: 'boobies',
-            },
-            {
-                key: 'impostor',
-                value: 'amogus',
-            },
-        ];
+
+        const parsed = new Map([
+            ['boinoing', 'boobies'],
+            ['impostor', 'amogus'],
+        ]);
         const schema = s.map({
             key: s.string(),
             value: s.string(),
         });
+        const result = schema.safeParse(example);
+        if (result.success) {
+            console.log(result.data);
+            expect(result.data).toEqual(parsed);
+        } else {
+            console.error(result.error);
+            throw new Error('Failed to parse');
+        }
         evaluateResultHelper(schema, example, parsed);
     });
 
@@ -479,14 +482,6 @@ describe('boing', () => {
                 boing: s.string(),
             })
         );
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
         evaluateResultHelper(schema, example, parsed);
     });
 
