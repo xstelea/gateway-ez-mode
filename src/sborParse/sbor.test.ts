@@ -3,6 +3,22 @@ import { describe, expect, it } from 'vitest';
 import { boingEvents, complex, swapEvent } from './programatic-json';
 import { s } from './schema';
 import { ProgrammaticScryptoSborValue } from '@radixdlt/babylon-gateway-api-sdk';
+import { SborSchema } from './sborSchema';
+
+function evaluateResultHelper<S extends SborSchema<any>, E>(
+    schema: S,
+    example: ProgrammaticScryptoSborValue,
+    expectedParsedValue: E
+) {
+    const result = schema.safeParse(example);
+    if (result.success) {
+        console.log(result.data);
+        expect(result.data).toEqual(expectedParsedValue);
+    } else {
+        console.error(result.error);
+        throw new Error('Failed to parse');
+    }
+}
 
 // Example usage:
 describe('boing', () => {
@@ -157,15 +173,7 @@ describe('boing', () => {
             key: s.string(),
             value: s.string(),
         });
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
-        console.log(JSON.stringify(result, null, 2));
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse a kvs address (Own)', () => {
@@ -180,14 +188,8 @@ describe('boing', () => {
             'internal_keyvaluestore_rdx1krcfpw0y5les3c725s5py0aqmecymsagzqvx92sz3ul2ecfmdytjq8';
 
         const schema = s.internalAddress();
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse a tuple', () => {
@@ -207,17 +209,9 @@ describe('boing', () => {
             ],
         };
         const parsed = ['hello', 5];
-
         const schema = s.tuple([s.string(), s.number()]);
 
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse a very nested tuple', () => {
@@ -268,14 +262,7 @@ describe('boing', () => {
             s.tuple([s.string(), s.number()]),
         ]);
 
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse all possible variants of an enum', () => {
@@ -426,15 +413,8 @@ describe('boing', () => {
             },
         ];
 
-        examples.forEach((example) => {
-            const result = schema.safeParse(example);
-            if (result.success) {
-                console.log(result.data);
-                expect(result.data).toEqual(parsed.shift());
-            } else {
-                console.error(result.error);
-                throw new Error('Failed to parse');
-            }
+        examples.forEach((example, i) => {
+            evaluateResultHelper(schema, example, parsed[i]);
         });
     });
 
@@ -449,14 +429,7 @@ describe('boing', () => {
         const parsed = new Date(Date.parse('2025-03-11T17:08:49.000Z'));
 
         const schema = s.instant();
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse a None', () => {
@@ -473,14 +446,7 @@ describe('boing', () => {
         };
 
         const schema = s.option(s.string());
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse a Some', () => {
@@ -502,15 +468,7 @@ describe('boing', () => {
         };
 
         const schema = s.option(s.string());
-        const result = schema.safeParse(example);
-
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
 
     it('parse an array of non fungible local ids', () => {
@@ -534,19 +492,10 @@ describe('boing', () => {
                 },
             ],
         };
-
         const parsed = ['#1#', '#2#', '#3#'];
-
         const schema = s.array(s.nonFungibleLocalId());
-        const result = schema.safeParse(example);
 
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
+        evaluateResultHelper(schema, example, parsed);
     });
     it('parse a multi-layered structure of doom', () => {
         /**
@@ -745,14 +694,6 @@ describe('boing', () => {
             ],
         ];
 
-        // 4) Parse and test
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log('Parsed data:', JSON.stringify(result.data, null, 2));
-            expect(result.data).toEqual(expectedParsedValue);
-        } else {
-            console.error('Parsing error:', result.error);
-            throw new Error('Failed to parse the monstrous structure');
-        }
+        evaluateResultHelper(schema, example, expectedParsedValue);
     });
 });
