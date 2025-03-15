@@ -1,6 +1,6 @@
 {
   "name": "@calamari-radix/gateway-ez-mode",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -21,18 +21,15 @@
     "@radixdlt/radix-engine-toolkit": "^1.0.5",
     "@types/luxon": "^3.4.2",
     "eslint": "^9.21.0",
-    "eslint-config": "workspace:*",
+    "@calamari-radix/eslint-config": "workspace:*",
     "luxon": "^3.5.0",
     "typescript": "5.7.3",
     "vitest": "^3.0.7"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@radixdlt/babylon-gateway-api-sdk": "^1.10.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "secp256k1"
-    ]
   }
 }
