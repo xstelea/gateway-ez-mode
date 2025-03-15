@@ -6,7 +6,8 @@ All devs in Radix, whether frontend or backend, surely have written helpers that
 
 ## Packages
 
-- [gateway-ez-mode](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
+- `gateway-ez-mode`
+    - [README.md](./packages/gateway-ez-mode/README.md)
     - Helpers for interfacing with the Radix Gateway. Fetch account balances, stream transactions, get resource info and more.
 - [sbor-ez-mode](https://www.npmjs.com/package/@calamari-radix/sbor-ez-mode)
     - A schema definition and parsing library for parsing Scrypto SBOR JSON into JavaScript objects.
