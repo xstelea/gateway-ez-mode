@@ -1,6 +1,5 @@
 {
     "name": "gateway-ez-mode-mono",
-    "private": true,
     "workspaces": [
         "packages/*"
     ],
@@ -12,14 +11,13 @@
         "check-types": "turbo run check-types",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "all-checks": "pnpm run lint && pnpm run check-types && pnpm run test && pnpm run format:check"
+        "all-checks": "pnpm run lint && pnpm run check-types && pnpm run test && pnpm run format:check",
+        "release": "pnpm all-checks && pnpm build && changeset version && changeset publish"
     },
     "devDependencies": {
-        "@eslint/js": "^9.21.0",
-        "globals": "^16.0.0",
+        "@changesets/cli": "^2.28.1",
         "prettier": "^3.5.2",
-        "turbo": "^2.4.4",
-        "typescript-eslint": "^8.25.0"
+        "turbo": "^2.4.4"
     },
     "packageManager": "pnpm@10.6.3"
 }
