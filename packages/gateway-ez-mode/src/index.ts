@@ -12,6 +12,8 @@ import {
     TransactionStream,
     TransactionStreamInput,
 } from './stream/transactionStream';
+import s from '@calamari-radix/sbor-ez-mode';
+export { s };
 
 type GetTransactionStreamInput = Partial<
     Omit<TransactionStreamInput, 'gateway' | 'stateVersionManager'>
@@ -94,4 +96,3 @@ export class GatewayEzMode {
         });
     }
 }
-export { s } from './sborParse/factory';

@@ -1,6 +1,6 @@
 {
-  "name": "@calamari-radix/gateway-ez-mode",
-  "version": "1.4.2",
+  "name": "@calamari-radix/sbor-ez-mode",
+  "version": "0.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,21 +16,17 @@
     "type": "github"
   },
   "license": "MIT",
-  "description": "Some higher-level abstractions on top of the Radix Babylon Gateway TypeScript SDK",
+  "description": "A TypeScript schema definition and parsing library for the Scrypto SBOR Programmatic JSON representation",
   "devDependencies": {
-    "@radixdlt/radix-engine-toolkit": "^1.0.5",
-    "@types/luxon": "^3.4.2",
     "eslint": "^9.21.0",
     "@calamari-radix/eslint-config": "workspace:*",
-    "luxon": "^3.5.0",
     "typescript": "5.7.3",
     "vitest": "^3.0.7"
   },
+  "dependencies": {
+    "@radixdlt/babylon-gateway-api-sdk": "^1.10.0"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "@radixdlt/babylon-gateway-api-sdk": "^1.10.0",
-    "@calamari-radix/sbor-ez-mode": "workspace:*"
   }
 }
