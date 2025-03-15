@@ -2,6 +2,14 @@
 
 The simple way to parse Programmatic JSON into nice JavaScript objects with an api inspired by Zod.
 
+## Installation
+
+```sh
+npm install @calamari-radix/sbor-ez-mode
+```
+
+## Usage
+
 ## Parsing ProgrammaticScryptoSborValue
 
 The Radix network uses a custom data serialization standard called Scrypto SBOR for storing on-ledger state. This data format can be represented and consumed as JSON in a special representation called Scrypto SBOR Programmatic JSON. While the Babylon Gateway SDK has good types for this programmatic JSON, it is quite difficult and time-consuming to parse the values coming from ledger into workable JS/TS values.
