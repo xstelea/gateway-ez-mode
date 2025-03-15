@@ -13,6 +13,9 @@ import {
     TransactionStreamInput,
 } from './stream/transactionStream';
 
+type GetTransactionStreamInput = Partial<
+    Omit<TransactionStreamInput, 'gateway' | 'stateVersionManager'>
+>;
 /**
  * A wrapper around the GatewayApiClient that provides
  * a more user-friendly interface for common tasks.
@@ -83,7 +86,7 @@ export class GatewayEzMode {
     async getTransactionStream({
         startStateVersion,
         batchSize,
-    }: Partial<TransactionStreamInput>): Promise<TransactionStream> {
+    }: GetTransactionStreamInput): Promise<TransactionStream> {
         return TransactionStream.create({
             gateway: this.gateway,
             startStateVersion,
