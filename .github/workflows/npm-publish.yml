@@ -31,16 +31,10 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
 
-      # Install pnpm
-      - run: npm install -g pnpm
-
-      # Install dependencies
+      - run: npm run install-pnpm
       - run: pnpm install --frozen-lockfile
-
-      # Build your project
-      - run: pnpm run build
-
-      # Publish to npm
+      - run: pnpm all-checks
+      - run: pnpm build
       - run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
