@@ -19,7 +19,7 @@ export interface NftBalance {
     nftBalance: NftInfo[];
 }
 
-/** Represents one NFT */
+/** Represents an NFT */
 export interface NftInfo {
     name: string | null;
     description: string | null;
