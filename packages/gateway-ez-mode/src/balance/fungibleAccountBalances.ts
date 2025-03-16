@@ -3,11 +3,7 @@ import {
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { FungibleResourceBalance } from '../types';
-import {
-    extractStringArrayMetadata,
-    extractStringMetadata,
-    extractUrlMetadata,
-} from '../data_extractors/metadata';
+import { extractAllMetadataValues } from '../data_extractors/metadata';
 
 export async function getFungibleBalancesForAccount(
     gatewayApi: GatewayApiClient,
@@ -57,40 +53,25 @@ export async function getFungibleBalancesForAccount(
                 return [];
             }
 
-            const tokenSymbol = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'symbol'
-            );
-            const tokenName = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'name'
-            );
-            const tokenDescription = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'description'
-            );
-            const tokenIconUrl = extractUrlMetadata(
-                tokenInfoItem.metadata,
-                'icon_url'
-            );
-            const tokenInfoUrl = extractUrlMetadata(
-                tokenInfoItem.metadata,
-                'info_url'
-            );
-            const tokenTags = extractStringArrayMetadata(
-                tokenInfoItem.metadata,
-                'tags'
-            );
+            const { symbol, name, description, icon_url, info_url, tags } =
+                extractAllMetadataValues(tokenInfoItem.metadata, {
+                    symbol: 'String',
+                    name: 'String',
+                    description: 'String',
+                    icon_url: 'Url',
+                    info_url: 'Url',
+                    tags: 'StringArray',
+                });
 
             return {
                 resourceInfo: {
                     resourceAddress: item.resource_address,
-                    name: tokenName,
-                    iconUrl: tokenIconUrl,
-                    symbol: tokenSymbol,
-                    description: tokenDescription,
-                    tags: tokenTags,
-                    infoUrl: tokenInfoUrl,
+                    symbol,
+                    name,
+                    description,
+                    iconUrl: icon_url,
+                    infoUrl: info_url,
+                    tags,
                 },
                 balance: item.amount,
             };

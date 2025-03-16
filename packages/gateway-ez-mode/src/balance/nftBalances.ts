@@ -3,11 +3,7 @@ import {
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { NftBalance, ResourceInfo } from '../types';
-import {
-    extractStringArrayMetadata,
-    extractStringMetadata,
-    extractUrlMetadata,
-} from '../data_extractors/metadata';
+import { extractAllMetadataValues } from '../data_extractors/metadata';
 import { extractStringNftData } from '../data_extractors/nftData';
 
 export async function getNonFungibleBalancesForAccount(
@@ -64,29 +60,26 @@ export async function getNonFungibleBalancesForAccount(
         if (!tokenInfoItem) return [];
         if (tokenInfoItem?.details?.type != 'NonFungibleResource') return [];
 
-        const tokenName = extractStringMetadata(tokenInfoItem.metadata, 'name');
-        const tokenDescription = extractStringMetadata(
-            tokenInfoItem.metadata,
-            'description'
-        );
-        const tokenSymbol = extractStringMetadata(
-            tokenInfoItem.metadata,
-            'symbol'
-        );
-        const iconUrl = extractUrlMetadata(tokenInfoItem.metadata, 'icon_url');
-        const infoUrl = extractUrlMetadata(tokenInfoItem.metadata, 'info_url');
-        const tags = extractStringArrayMetadata(tokenInfoItem.metadata, 'tags');
+        const { name, description, symbol, icon_url, info_url, tags } =
+            extractAllMetadataValues(tokenInfoItem.metadata, {
+                symbol: 'String',
+                name: 'String',
+                description: 'String',
+                icon_url: 'Url',
+                info_url: 'Url',
+                tags: 'StringArray',
+            });
 
         const nonFungibleIds = item.vaults.items.flatMap(
             (item) => item.items || []
         );
         const resourceInfo: ResourceInfo = {
             resourceAddress: item.resource_address,
-            name: tokenName,
-            description: tokenDescription,
-            symbol: tokenSymbol,
-            iconUrl: iconUrl,
-            infoUrl: infoUrl,
+            symbol,
+            name,
+            description,
+            iconUrl: icon_url,
+            infoUrl: info_url,
             tags,
         };
         return (async (): Promise<NftBalance> => {
