@@ -3,11 +3,7 @@ import {
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { FungibleResourceBalance } from '../types';
-import {
-    extractStringArrayMetadata,
-    extractStringMetadata,
-    extractUrlMetadata,
-} from '../data_extractors/metadata';
+import { fetchResourceInformation } from '../resource/information';
 
 export async function getFungibleBalancesForAccount(
     gatewayApi: GatewayApiClient,
@@ -39,61 +35,26 @@ export async function getFungibleBalancesForAccount(
 
     const tokenAddresses =
         balances.items.map((item) => item.resource_address) || [];
-    const tokenInfoItems =
-        await gatewayApi.state.getEntityDetailsVaultAggregated(tokenAddresses);
-
-    return (
-        balances.items.flatMap((item) => {
-            if (item.aggregation_level !== ResourceAggregationLevel.Global)
-                throw new Error('Unexpected aggregation level');
-
-            const tokenInfoItem = tokenInfoItems.find(
-                (tokenInfo) => tokenInfo.address == item.resource_address
-            );
-            if (!tokenInfoItem) {
-                return [];
-            }
-            if (tokenInfoItem?.details?.type != 'FungibleResource') {
-                return [];
-            }
-
-            const tokenSymbol = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'symbol'
-            );
-            const tokenName = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'name'
-            );
-            const tokenDescription = extractStringMetadata(
-                tokenInfoItem.metadata,
-                'description'
-            );
-            const tokenIconUrl = extractUrlMetadata(
-                tokenInfoItem.metadata,
-                'icon_url'
-            );
-            const tokenInfoUrl = extractUrlMetadata(
-                tokenInfoItem.metadata,
-                'info_url'
-            );
-            const tokenTags = extractStringArrayMetadata(
-                tokenInfoItem.metadata,
-                'tags'
-            );
-
-            return {
-                resourceInfo: {
-                    resourceAddress: item.resource_address,
-                    name: tokenName,
-                    iconUrl: tokenIconUrl,
-                    symbol: tokenSymbol,
-                    description: tokenDescription,
-                    tags: tokenTags,
-                    infoUrl: tokenInfoUrl,
-                },
-                balance: item.amount,
-            };
-        }) || []
+    const tokenInfoItems = await fetchResourceInformation(
+        gatewayApi,
+        tokenAddresses
     );
+
+    return balances.items.map((item) => {
+        if (item.aggregation_level !== ResourceAggregationLevel.Global) {
+            throw new Error('Unexpected aggregation level');
+        }
+        const tokenInfo = tokenInfoItems.find(
+            (tokenInfo) => tokenInfo.resourceAddress == item.resource_address
+        );
+        if (!tokenInfo) {
+            throw new Error(
+                `Token info not found for resource address ${item.resource_address}`
+            );
+        }
+        return {
+            resourceInfo: tokenInfo,
+            balance: item.amount,
+        };
+    });
 }

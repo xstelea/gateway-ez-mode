@@ -20,8 +20,7 @@ function evaluateResultHelper<S extends SborSchema<any>, E>(
     }
 }
 
-// Example usage:
-describe('boing', () => {
+describe('sbor', () => {
     it('parse a complex example', () => {
         const schema = s.struct({
             updates: s.array(
@@ -50,8 +49,6 @@ describe('boing', () => {
         } else {
             throw new Error('Failed to parse');
         }
-
-        // console.log(JSON.stringify(result, null, 2));
     });
 
     it('parse a struct', () => {
@@ -149,22 +146,10 @@ describe('boing', () => {
         boingEvents.forEach((event) => {
             const result = schema.safeParse(event);
             if (result.success) {
-                switch (result.data.variant) {
-                    case 'StructBased':
-                        console.log(result.data.value.name);
-                        break;
-                    case 'TupleBasedTwoVals':
-                        console.log(result.data);
-                        break;
-                    case 'ContainsOption':
-                        console.log(result.data.value.option.variant);
-                        break;
-                }
+                // console.log(result.data);
             } else {
-                console.error(result.error);
                 throw new Error('Failed to parse');
             }
-            console.log(JSON.stringify(result, null, 2));
         });
     });
 
@@ -206,14 +191,6 @@ describe('boing', () => {
             key: s.string(),
             value: s.string(),
         });
-        const result = schema.safeParse(example);
-        if (result.success) {
-            console.log(result.data);
-            expect(result.data).toEqual(parsed);
-        } else {
-            console.error(result.error);
-            throw new Error('Failed to parse');
-        }
         evaluateResultHelper(schema, example, parsed);
     });
 

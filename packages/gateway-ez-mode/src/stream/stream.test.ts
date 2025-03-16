@@ -16,18 +16,8 @@ describe(
             });
             let transactions = await stream.next();
             while (transactions.lastSeenStateVersion < TO_STATE_VERSION) {
-                console.log(
-                    transactions.transactions.map((tx) => tx.state_version)
-                );
                 transactions = await stream.next();
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                transactions.transactions.forEach((tx) => {
-                    tx.receipt?.detailed_events?.forEach((event) => {
-                        if (event.identifier.event == 'SwapEvent') {
-                            console.log(event);
-                        }
-                    });
-                });
             }
         });
     },
