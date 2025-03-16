@@ -23,7 +23,7 @@ describe('gatewaySdk', () => {
         const gateway = new GatewayEzMode();
         const account = gateway.getAccount(SOME_RANDOM_ACCOUNT);
         const balances = await account.getFungibleBalances();
-        console.log(balances);
+        console.log(balances[0]);
         expect(balances).toBeDefined();
     });
 
@@ -53,8 +53,6 @@ describe('gatewaySdk', () => {
     it('should be able to get nft balances', async () => {
         const account = new Account(SOME_RANDOM_ACCOUNT);
         const balances = await account.getNftBalances();
-        balances.forEach((balance) => {
-            console.log(balance);
-        });
+        console.log(balances[0]);
     });
 });
