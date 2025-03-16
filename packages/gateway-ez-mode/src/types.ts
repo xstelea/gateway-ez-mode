@@ -1,3 +1,5 @@
+import { MetadataExtractor } from './data_extractors/metadata';
+
 export interface ResourceInfo {
     resourceAddress: string;
     name: string | null;
@@ -6,6 +8,8 @@ export interface ResourceInfo {
     iconUrl: string | null;
     infoUrl: string | null;
     tags: string[] | null;
+    getMetadataValue: typeof MetadataExtractor.prototype.extractMetadataValue;
+    getMetadataValues: typeof MetadataExtractor.prototype.extractAllMetadataValues;
 }
 
 export interface FungibleResourceBalance {

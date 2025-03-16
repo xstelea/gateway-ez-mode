@@ -2,9 +2,9 @@ import {
     GatewayApiClient,
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
-import { NftBalance, ResourceInfo } from '../types';
-import { extractAllMetadataValues } from '../data_extractors/metadata';
+import { NftBalance } from '../types';
 import { extractStringNftData } from '../data_extractors/nftData';
+import { fetchResourceInformation } from '../resource/information';
 
 export async function getNonFungibleBalancesForAccount(
     gatewayApi: GatewayApiClient,
@@ -46,52 +46,38 @@ export async function getNonFungibleBalancesForAccount(
     const tokenAddresses = nonFungibles.items.map(
         (item) => item.resource_address
     );
-    const tokenInfoItems =
-        await gatewayApi.state.getEntityDetailsVaultAggregated(tokenAddresses);
+    const tokenInfoItems = await fetchResourceInformation(
+        gatewayApi,
+        tokenAddresses
+    );
 
-    // Process non-fungible results
-    const nonFungibleResults = nonFungibles.items.flatMap((item) => {
-        if (item.aggregation_level !== ResourceAggregationLevel.Vault)
+    const nonFungibleResults = nonFungibles.items.map((item) => {
+        if (item.aggregation_level !== ResourceAggregationLevel.Vault) {
             throw new Error('Unexpected aggregation level');
-
+        }
         const tokenInfoItem = tokenInfoItems.find(
-            (tokenInfo) => tokenInfo.address == item.resource_address
+            (tokenInfo) => tokenInfo.resourceAddress == item.resource_address
         );
-        if (!tokenInfoItem) return [];
-        if (tokenInfoItem?.details?.type != 'NonFungibleResource') return [];
-
-        const { name, description, symbol, icon_url, info_url, tags } =
-            extractAllMetadataValues(tokenInfoItem.metadata, {
-                symbol: 'String',
-                name: 'String',
-                description: 'String',
-                icon_url: 'Url',
-                info_url: 'Url',
-                tags: 'StringArray',
-            });
-
+        if (!tokenInfoItem) {
+            throw new Error(
+                `Token info not found for resource address ${item.resource_address}`
+            );
+        }
         const nonFungibleIds = item.vaults.items.flatMap(
             (item) => item.items || []
         );
-        const resourceInfo: ResourceInfo = {
-            resourceAddress: item.resource_address,
-            symbol,
-            name,
-            description,
-            iconUrl: icon_url,
-            infoUrl: info_url,
-            tags,
-        };
         return (async (): Promise<NftBalance> => {
             if (nonFungibleIds.length == 0) {
                 return {
-                    resourceInfo,
+                    resourceInfo: tokenInfoItem,
                     nftBalance: [],
                 };
             }
             const nftData = await gatewayApi.state.innerClient.nonFungibleData({
                 stateNonFungibleDataRequest: {
-                    non_fungible_ids: nonFungibleIds,
+                    non_fungible_ids: item.vaults.items.flatMap(
+                        (item) => item.items || []
+                    ),
                     resource_address: item.resource_address,
                     at_ledger_state: {
                         state_version: nonFungibles.ledger_state.state_version,
@@ -112,7 +98,7 @@ export async function getNonFungibleBalancesForAccount(
             });
 
             return {
-                resourceInfo,
+                resourceInfo: tokenInfoItem,
                 nftBalance: parsed,
             } as NftBalance;
         })();
