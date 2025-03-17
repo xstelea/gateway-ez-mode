@@ -5,9 +5,9 @@ import {
 import { SborError, SborSchema } from '../sborSchema';
 import { ParsedType } from './struct';
 
-export class ArraySchema<
-    T extends SborSchema<unknown, unknown>,
-> extends SborSchema<ParsedType<T>[]> {
+export class ArraySchema<T extends SborSchema<unknown>> extends SborSchema<
+    ParsedType<T>[]
+> {
     private itemSchema: T;
 
     constructor(itemSchema: T) {

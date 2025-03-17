@@ -1,4 +1,5 @@
 import { ProgrammaticScryptoSborValue } from '@radixdlt/babylon-gateway-api-sdk';
+import { err, ok, Result } from 'neverthrow';
 
 // Schema and parsing errors
 export class SborError extends Error {
@@ -59,7 +60,7 @@ export const kinds: [
 
 export type SborKind = ProgrammaticScryptoSborValue['kind'];
 // Base schema class
-export abstract class SborSchema<T, O = T> {
+export abstract class SborSchema<T> {
     readonly kinds: SborKind[];
 
     constructor(kinds: SborKind[]) {
@@ -73,14 +74,15 @@ export abstract class SborSchema<T, O = T> {
 
     abstract parse(value: ProgrammaticScryptoSborValue, path: string[]): T;
 
-    safeParse(
-        value: ProgrammaticScryptoSborValue
-    ): { success: true; data: O } | { success: false; error: SborError } {
+    safeParse(value: ProgrammaticScryptoSborValue): Result<T, SborError> {
         try {
             const data = this.parse(value, []);
-            return { success: true, data: data as unknown as O };
+            return ok(data);
         } catch (error) {
-            return { success: false, error: error as SborError };
+            if (error instanceof SborError) {
+                return err(error);
+            }
+            throw error;
         }
     }
 }

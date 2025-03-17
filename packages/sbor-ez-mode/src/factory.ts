@@ -95,7 +95,34 @@ export const s = {
      * ```
      */
     struct: <T extends StructDefinition>(definition: T) =>
-        new StructSchema(definition),
+        new StructSchema(definition, false),
+    /**
+     * A schema for a struct, where missing fields are allowed and parsed as `null`.
+     * This is useful for when you don't know exactly what fields will be present in the struct.
+     * @param definition The struct definition, which is an object of schemas that describes the fields of the struct
+     * @returns StructSchema
+     *
+     * @example
+     * ```ts
+     * const myStructSchema = s.structNullable({
+     *   bing: s.string(),
+     *   bong: s.number(),
+     *   foo: s.number(),
+     * });
+     * ```
+     * Parsing a struct that doesn't have 'foo' will give back:
+     * ```json
+     * {
+     *  bing: "hello",
+     *  bong: 123,
+     *  foo: null
+     * }
+     * ```
+     */
+    structNullable: <T extends StructDefinition>(definition: T) =>
+        new StructSchema(definition, true),
+    // structNullable: <T extends StructDefinition>(definition: T) =>
+    //     new StructSchema(definition, true),
     /**
      * A schema for an Ordered Tuple. The SBOR kind of "Tuple" is shared between Rust structs and tupled, so
      * we explicitly call this an OrderedTuple to avoid confusion.
@@ -120,8 +147,7 @@ export const s = {
      * const myNestedArraySchema = s.array(s.array(s.number()));
      * ```
      */
-    array: <T extends SborSchema<any, any>>(schema: T) =>
-        new ArraySchema<T>(schema),
+    array: <T extends SborSchema<any>>(schema: T) => new ArraySchema<T>(schema),
     /**
      * A schema for an Enum
      * @param variants An array of variant definitions, which are objects with a string variant name and a schema.
@@ -160,7 +186,7 @@ export const s = {
      */
     enum: <
         const T extends VariantDefinition<S>[],
-        S extends StructSchema<any> | OrderedTupleSchema<B>,
+        S extends StructSchema<any, any> | OrderedTupleSchema<B>,
         B extends TupleSchema,
     >(
         variants: T

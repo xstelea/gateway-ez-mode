@@ -4,10 +4,10 @@ import {
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborError, SborSchema } from '../sborSchema';
 
-export type TupleSchema = SborSchema<unknown, unknown>[];
+export type TupleSchema = SborSchema<unknown>[];
 
 export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<{
-    [K in keyof T]: T[K] extends SborSchema<infer U, unknown> ? U : never;
+    [K in keyof T]: T[K] extends SborSchema<infer U> ? U : never;
 }> {
     private schemas: T;
 
@@ -55,7 +55,7 @@ export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<{
         value: ProgrammaticScryptoSborValue,
         path: string[]
     ): {
-        [K in keyof T]: T[K] extends SborSchema<infer U, unknown> ? U : never;
+        [K in keyof T]: T[K] extends SborSchema<infer U> ? U : never;
     } {
         this.validate(value, path);
         const tupleValue = value as ProgrammaticScryptoSborValueTuple;
@@ -65,9 +65,7 @@ export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<{
             const schema = this.schemas[index];
             return schema.parse(field, [...path, index.toString()]);
         }) as {
-            [K in keyof T]: T[K] extends SborSchema<infer U, unknown>
-                ? U
-                : never;
+            [K in keyof T]: T[K] extends SborSchema<infer U> ? U : never;
         };
     }
 }

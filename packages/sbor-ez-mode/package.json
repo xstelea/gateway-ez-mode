@@ -18,13 +18,14 @@
   "license": "MIT",
   "description": "A TypeScript schema definition and parsing library for the Scrypto SBOR Programmatic JSON representation",
   "devDependencies": {
-    "eslint": "^9.21.0",
     "@calamari-radix/eslint-config": "workspace:*",
+    "eslint": "^9.21.0",
     "typescript": "5.7.3",
     "vitest": "^3.0.7"
   },
   "dependencies": {
-    "@radixdlt/babylon-gateway-api-sdk": "^1.10.0"
+    "@radixdlt/babylon-gateway-api-sdk": "^1.10.0",
+    "neverthrow": "^8.2.0"
   },
   "publishConfig": {
     "access": "public"

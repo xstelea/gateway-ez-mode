@@ -8,7 +8,7 @@ import { SborError, SborSchema } from '../sborSchema';
 export class OptionSchema<T extends SborSchema<any>> extends SborSchema<
     | {
           variant: 'Some';
-          value: T extends SborSchema<any, infer O> ? O : never;
+          value: T extends SborSchema<infer O> ? O : never;
       }
     | {
           variant: 'None';
@@ -53,7 +53,7 @@ export class OptionSchema<T extends SborSchema<any>> extends SborSchema<
     ):
         | {
               variant: 'Some';
-              value: T extends SborSchema<any, infer O> ? O : never;
+              value: T extends SborSchema<infer O> ? O : never;
           }
         | {
               variant: 'None';
