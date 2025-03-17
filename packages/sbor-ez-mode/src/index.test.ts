@@ -11,11 +11,9 @@ function evaluateResultHelper<S extends SborSchema<any>, E>(
     expectedParsedValue: E
 ) {
     const result = schema.safeParse(example);
-    if (result.success) {
-        // console.log(result.data);
-        expect(result.data).toEqual(expectedParsedValue);
+    if (result.isOk()) {
+        expect(result.value).toEqual(expectedParsedValue);
     } else {
-        console.error(result.error);
         throw new Error('Failed to parse');
     }
 }
@@ -42,10 +40,10 @@ describe('sbor', () => {
 
         const result = schema.safeParse(complex);
 
-        if (result.success) {
-            // result.data.updates.forEach((update) => {
-            //     console.log(update[1]);
-            // });
+        if (result.isOk()) {
+            result.value.updates.forEach((update) => {
+                console.log(update[1]);
+            });
         } else {
             throw new Error('Failed to parse');
         }
@@ -107,6 +105,79 @@ describe('sbor', () => {
         evaluateResultHelper(swapEventSchema, example, parsed);
     });
 
+    it('parse a nullable struct', () => {
+        const example: ProgrammaticScryptoSborValue = {
+            kind: 'Tuple',
+            fields: [
+                {
+                    kind: 'String',
+                    value: 'boing',
+                    field_name: 'foo',
+                },
+                {
+                    kind: 'String',
+                    value: 'boing',
+                    field_name: 'bar',
+                },
+            ],
+        };
+
+        const parsed = {
+            foo: 'boing',
+            bar: 'boing',
+            boing: null,
+        };
+
+        const schema = s.structNullable({
+            foo: s.string(),
+            bar: s.string(),
+            // boing is not really a part of the
+            // type we're parsing, so it should be null
+            boing: s.string(),
+        });
+
+        evaluateResultHelper(schema, example, parsed);
+    });
+
+    it('parse a nullable struct where the value is present', () => {
+        const example: ProgrammaticScryptoSborValue = {
+            kind: 'Tuple',
+            fields: [
+                {
+                    kind: 'String',
+                    value: 'boing',
+                    field_name: 'foo',
+                },
+                {
+                    kind: 'String',
+                    value: 'boing',
+                    field_name: 'bar',
+                },
+                {
+                    kind: 'String',
+                    value: 'boing',
+                    field_name: 'boing',
+                },
+            ],
+        };
+
+        const parsed = {
+            foo: 'boing',
+            bar: 'boing',
+            boing: 'boing',
+        };
+
+        const schema = s.structNullable({
+            foo: s.string(),
+            bar: s.string(),
+            // this time, boing is present,
+            // so it should be parsed as a string and not null
+            boing: s.string(),
+        });
+
+        evaluateResultHelper(schema, example, parsed);
+    });
+
     it('parse an enum', () => {
         const schema = s.enum([
             {
@@ -145,8 +216,8 @@ describe('sbor', () => {
 
         boingEvents.forEach((event) => {
             const result = schema.safeParse(event);
-            if (result.success) {
-                // console.log(result.data);
+            if (result.isOk()) {
+                console.log(result.value);
             } else {
                 throw new Error('Failed to parse');
             }
@@ -527,21 +598,7 @@ describe('sbor', () => {
         evaluateResultHelper(schema, example, parsed);
     });
     it('parse a multi-layered structure of doom', () => {
-        /**
-         * We'll construct a top-level Tuple with:
-         * 1) A Struct
-         * 2) An Array (of Enums)
-         *
-         * Inside the Struct we'll have:
-         * - A string field 'name'
-         * - An array 'complicated_array' which contains a Tuple with [Decimal, Enum, Bool]
-         *
-         * The second item in the top-level tuple is an Array of Enums, each variant can be different.
-         */
-
-        // 1) The monster schema definition
         const schema = s.tuple([
-            // The struct part
             s.struct({
                 name: s.string(),
                 complicated_array: s.array(

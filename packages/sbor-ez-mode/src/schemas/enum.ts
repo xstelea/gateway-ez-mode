@@ -9,7 +9,7 @@ import { ParsedType, StructSchema } from './struct'; // Assuming you have this f
 import { OrderedTupleSchema } from './orderedTuple'; // Assuming you have this from your previous code
 
 export interface VariantDefinition<
-    S extends StructSchema<any> | OrderedTupleSchema<any>,
+    S extends StructSchema<any, any> | OrderedTupleSchema<any>,
 > {
     variant: string;
     schema: S;
@@ -17,7 +17,7 @@ export interface VariantDefinition<
 
 // Helper types to extract parsed and output types from variant schemas
 type VariantParsedType<T extends VariantDefinition<any>> =
-    T['schema'] extends StructSchema<infer U>
+    T['schema'] extends StructSchema<infer U, any>
         ? { [K in keyof U]: ParsedType<U[K]> }
         : T['schema'] extends OrderedTupleSchema<infer U>
           ? { [K in keyof U]: ParsedType<U[K]> }
@@ -25,7 +25,7 @@ type VariantParsedType<T extends VariantDefinition<any>> =
 
 export type EnumParsedType<T extends VariantDefinition<any>[]> = {
     [K in keyof T]: T[K] extends VariantDefinition<infer S>
-        ? S extends StructSchema<any>
+        ? S extends StructSchema<any, any>
             ? {
                   variant: T[K]['variant'];
                   value: VariantParsedType<T[K]>;

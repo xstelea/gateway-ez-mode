@@ -7,8 +7,8 @@ import { SborError, SborSchema } from '../sborSchema';
 import { ParsedType } from './struct';
 
 export interface MapDefinition {
-    key: SborSchema<any, any>;
-    value: SborSchema<any, any>;
+    key: SborSchema<any>;
+    value: SborSchema<any>;
 }
 
 // export type MapDefinition = Map<any, any>

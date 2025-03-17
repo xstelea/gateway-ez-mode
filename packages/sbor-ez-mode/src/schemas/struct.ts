@@ -6,20 +6,30 @@ import { SborError, SborSchema } from '../sborSchema';
 
 // Tuple schema (acting like a struct)
 export interface StructDefinition {
-    [key: string]: SborSchema<unknown, unknown>;
+    [key: string]: SborSchema<unknown>;
 }
 
 export type ParsedType<T extends SborSchema<unknown>> =
-    T extends SborSchema<infer U, unknown> ? U : never;
+    T extends SborSchema<infer U> ? U : never;
 
-export class StructSchema<T extends StructDefinition> extends SborSchema<{
-    [K in keyof T]: ParsedType<T[K]>;
+export class StructSchema<
+    T extends StructDefinition,
+    O extends boolean = false,
+> extends SborSchema<{
+    [K in keyof T]: O extends true ? ParsedType<T[K]> | null : ParsedType<T[K]>;
 }> {
     private definition: T;
+    private allowMissing: O;
 
-    constructor(definition: T) {
+    /**
+     * @param definition The struct definition.
+     * @param allowMissing If true, missing fields are allowed and parsed as `null`;
+     *                     if false, missing fields will be a parsing error.
+     */
+    constructor(definition: T, allowMissing: O) {
         super(['Tuple']);
         this.definition = definition;
+        this.allowMissing = allowMissing;
     }
 
     validate(value: ProgrammaticScryptoSborValue, path: string[]): boolean {
@@ -36,24 +46,32 @@ export class StructSchema<T extends StructDefinition> extends SborSchema<{
         const fields = tupleValue.fields;
         const definedFields = Object.keys(this.definition);
 
-        // Check if all required fields are present
-        const fieldNames = fields.map((f) => f.field_name).filter(Boolean);
-        const missingFields = definedFields.filter(
-            (name) => !fieldNames.includes(name)
-        );
-        if (missingFields.length > 0) {
-            throw new SborError(
-                `Missing required fields: ${missingFields.join(', ')}`,
-                path
+        // If missing fields are not allowed, check for their existence.
+        if (!this.allowMissing) {
+            const fieldNames = fields.map((f) => f.field_name).filter(Boolean);
+            const missingFields = definedFields.filter(
+                (name) => !fieldNames.includes(name)
             );
+            if (missingFields.length > 0) {
+                throw new SborError(
+                    `Missing required fields: ${missingFields.join(', ')}`,
+                    path
+                );
+            }
         }
 
-        // Validate each field by name
-        return definedFields.every((name) => {
-            // Find the field by name
+        // Validate each field if present.
+        definedFields.forEach((name) => {
             const field = fields.find((f) => f.field_name === name);
             if (!field) {
-                throw new SborError(`Missing field: ${name}`, [...path, name]);
+                if (!this.allowMissing) {
+                    throw new SborError(`Missing field: ${name}`, [
+                        ...path,
+                        name,
+                    ]);
+                }
+                // If allowMissing is true, skip further validation.
+                return;
             }
 
             const schema = this.definition[name];
@@ -63,19 +81,24 @@ export class StructSchema<T extends StructDefinition> extends SborSchema<{
                     [...path, name]
                 );
             }
-
-            return schema.validate(field, [...path, name]);
+            schema.validate(field, [...path, name]);
         });
+
+        return true;
     }
 
     parse(
         value: ProgrammaticScryptoSborValue,
         path: string[]
-    ): { [K in keyof T]: ParsedType<T[K]> } {
+    ): {
+        [K in keyof T]: O extends true
+            ? ParsedType<T[K]> | null
+            : ParsedType<T[K]>;
+    } {
         this.validate(value, path);
         const tupleValue = value as ProgrammaticScryptoSborValueTuple;
         const fields = tupleValue.fields;
-        const result: Partial<{ [K in keyof T]: ParsedType<T[K]> }> = {};
+        const result: Partial<{ [K in keyof T]: ParsedType<T[K]> | null }> = {};
 
         Object.entries(this.definition).forEach(([name, schema]) => {
             const field = fields.find((f) => f.field_name === name);
@@ -83,10 +106,17 @@ export class StructSchema<T extends StructDefinition> extends SborSchema<{
                 result[name as keyof T] = schema.parse(field, [
                     ...path,
                     name,
-                ]) as ParsedType<T[keyof T]>;
+                ]) as ParsedType<T[typeof name]>;
+            } else {
+                // Only assign null if allowMissing is true.
+                result[name as keyof T] = null;
             }
         });
 
-        return result as { [K in keyof T]: ParsedType<T[K]> };
+        return result as {
+            [K in keyof T]: O extends true
+                ? ParsedType<T[K]> | null
+                : ParsedType<T[K]>;
+        };
     }
 }
