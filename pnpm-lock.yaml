@@ -43,6 +43,9 @@ importers:
       '@radixdlt/babylon-gateway-api-sdk':
         specifier: ^1.10.0
         version: 1.10.1
+      neverthrow:
+        specifier: ^8.2.0
+        version: 8.2.0
     devDependencies:
       '@calamari-radix/eslint-config':
         specifier: workspace:*

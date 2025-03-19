@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SborSchema } from './sborSchema';
 import { ArraySchema } from './schemas/array';
 import { BoolSchema } from './schemas/bool';
@@ -135,7 +134,7 @@ export const s = {
      * const structInTupleSchema = s.orderedTuple([s.struct({ foo: s.string() }), s.number()]);
      * ```
      */
-    tuple: <const T extends SborSchema<any>[]>(schemas: T) =>
+    tuple: <const T extends SborSchema<unknown>[]>(schemas: T) =>
         new OrderedTupleSchema(schemas),
     /**
      * A schema for an Array
@@ -147,7 +146,7 @@ export const s = {
      * const myNestedArraySchema = s.array(s.array(s.number()));
      * ```
      */
-    array: <T extends SborSchema<any>>(schema: T) => new ArraySchema<T>(schema),
+    array: <T>(schema: SborSchema<T>) => new ArraySchema(schema),
     /**
      * A schema for an Enum
      * @param variants An array of variant definitions, which are objects with a string variant name and a schema.
@@ -185,12 +184,14 @@ export const s = {
      * }
      */
     enum: <
-        const T extends VariantDefinition<S>[],
-        S extends StructSchema<any, any> | OrderedTupleSchema<B>,
-        B extends TupleSchema,
+        const VARIANT_DEF extends VariantDefinition<S>[],
+        S extends StructSchema<D, B> | OrderedTupleSchema<T>,
+        T extends TupleSchema,
+        D extends StructDefinition,
+        B extends boolean,
     >(
-        variants: T
-    ): EnumSchema<T> => new EnumSchema(variants),
+        variants: VARIANT_DEF
+    ): EnumSchema<VARIANT_DEF> => new EnumSchema(variants),
     /**
      * A utility schema for the Option enum in Rust. This is a common pattern in Rust to represent
      * nullable values. The Option schema takes a single schema as an argument, which describes the
@@ -198,7 +199,7 @@ export const s = {
      * @param schema The schema that describes the type of the value inside the Option
      * @returns OptionSchema
      */
-    option: <T extends SborSchema<any>>(schema: T) => new OptionSchema(schema),
+    option: <T>(schema: SborSchema<T>) => new OptionSchema(schema),
     /**
      * A schema for a Map
      * @param definition A definition that describes the type of the values in the map
@@ -209,6 +210,6 @@ export const s = {
      * ```
      * Parsing a map will give back an Map object with the keys and values parsed according to the schema.
      */
-    map: <T extends MapDefinition>(definition: T) =>
-        new MapSchema<T>(definition),
+    map: <K, V>(definition: MapDefinition<K, V>) =>
+        new MapSchema<K, V>(definition),
 };
