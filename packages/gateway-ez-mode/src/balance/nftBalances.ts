@@ -3,10 +3,20 @@ import {
     ResourceAggregationLevel,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { NftBalance } from '../types';
-import { extractStringNftData } from '../data_extractors/nftData';
+import { SborDataExtractor } from '../data_extractors/nftData';
 import { fetchResourceInformation } from '../resource/information';
-
-export async function getNonFungibleBalancesForAccount(
+import s from '@calamari-radix/sbor-ez-mode';
+import { GatewayError, IncorrectAddressType } from '../error';
+/**
+ * Fetches non-fungible balances for a given address
+ * @param gatewayApi The Radix Gateway API client
+ * @param address The component address to fetch non-fungible balances for (which may be an account)
+ * @returns A list of non-fungible balances
+ *
+ * @throws {GatewayError} If an error occurs while fetching data from the Radix Gateway API
+ * @throws {IncorrectAddressType} If the address of the resource is not of the correct type
+ */
+export async function getNonFungibleBalancesForComponent(
     gatewayApi: GatewayApiClient,
     address: string
 ): Promise<NftBalance[]> {
@@ -20,24 +30,35 @@ export async function getNonFungibleBalancesForAccount(
     };
 
     // Fetch first page of non-fungible resources
-    const nonFungibles =
-        await gatewayApi.state.innerClient.entityNonFungiblesPage({
-            stateEntityNonFungiblesPageRequest: request,
-        });
+    let nonFungibles;
+    try {
+        nonFungibles =
+            await gatewayApi.state.innerClient.entityNonFungiblesPage({
+                stateEntityNonFungiblesPageRequest: request,
+            });
+    } catch (error: any) {
+        throw new GatewayError(error);
+    }
 
     // Fetch additional pages if they exist
     let next_cursor_non_fungibles = nonFungibles.next_cursor;
     while (next_cursor_non_fungibles) {
-        const nextBalances =
-            await gatewayApi.state.innerClient.entityNonFungiblesPage({
-                stateEntityNonFungiblesPageRequest: {
-                    ...request,
-                    cursor: next_cursor_non_fungibles,
-                    at_ledger_state: {
-                        state_version: nonFungibles.ledger_state.state_version,
+        let nextBalances;
+        try {
+            nextBalances =
+                await gatewayApi.state.innerClient.entityNonFungiblesPage({
+                    stateEntityNonFungiblesPageRequest: {
+                        ...request,
+                        cursor: next_cursor_non_fungibles,
+                        at_ledger_state: {
+                            state_version:
+                                nonFungibles.ledger_state.state_version,
+                        },
                     },
-                },
-            });
+                });
+        } catch (error: any) {
+            throw new GatewayError(error);
+        }
         next_cursor_non_fungibles = nextBalances.next_cursor;
         nonFungibles.items.push(...nextBalances.items);
     }
@@ -46,26 +67,37 @@ export async function getNonFungibleBalancesForAccount(
     const tokenAddresses = nonFungibles.items.map(
         (item) => item.resource_address
     );
-    const tokenInfoItems = await fetchResourceInformation(
-        gatewayApi,
-        tokenAddresses
-    );
+    let tokenInfoItems;
+    try {
+        tokenInfoItems = await fetchResourceInformation(
+            gatewayApi,
+            tokenAddresses
+        );
+    } catch (error: any) {
+        throw new GatewayError(error);
+    }
 
     const nonFungibleResults = nonFungibles.items.map((item) => {
+        // this should never happen because we are querying with AggregationLevel.Vault
         if (item.aggregation_level !== ResourceAggregationLevel.Vault) {
             throw new Error('Unexpected aggregation level');
         }
         const tokenInfoItem = tokenInfoItems.find(
             (tokenInfo) => tokenInfo.resourceAddress == item.resource_address
         );
+        // This should never happen because if we query for a resource address, we should get that resource back
         if (!tokenInfoItem) {
             throw new Error(
                 `Token info not found for resource address ${item.resource_address}`
             );
         }
+        if (tokenInfoItem.type !== 'NonFungible')
+            throw new IncorrectAddressType();
+
         const nonFungibleIds = item.vaults.items.flatMap(
             (item) => item.items || []
         );
+
         return (async (): Promise<NftBalance> => {
             if (nonFungibleIds.length == 0) {
                 return {
@@ -73,27 +105,57 @@ export async function getNonFungibleBalancesForAccount(
                     nftBalance: [],
                 };
             }
-            const nftData = await gatewayApi.state.innerClient.nonFungibleData({
-                stateNonFungibleDataRequest: {
-                    non_fungible_ids: item.vaults.items.flatMap(
-                        (item) => item.items || []
-                    ),
-                    resource_address: item.resource_address,
-                    at_ledger_state: {
-                        state_version: nonFungibles.ledger_state.state_version,
+            let nftData;
+            try {
+                nftData = await gatewayApi.state.innerClient.nonFungibleData({
+                    stateNonFungibleDataRequest: {
+                        non_fungible_ids: item.vaults.items.flatMap(
+                            (item) => item.items || []
+                        ),
+                        resource_address: item.resource_address,
+                        at_ledger_state: {
+                            state_version:
+                                nonFungibles.ledger_state.state_version,
+                        },
                     },
-                },
-            });
+                });
+            } catch (error: any) {
+                throw new GatewayError(error);
+            }
 
             const parsed = nftData.non_fungible_ids.map((item) => {
-                const keyImageUrl = extractStringNftData(item, 'key_image_url');
-                const name = extractStringNftData(item, 'name');
-                const description = extractStringNftData(item, 'description');
+                if (!item.data?.programmatic_json) {
+                    return {
+                        id: item.non_fungible_id,
+                        keyImageUrl: null,
+                        name: null,
+                        description: null,
+                        nftData: null,
+                    };
+                }
+                const sborExtractor = new SborDataExtractor(
+                    item.data?.programmatic_json
+                );
+
+                const { key_image_url, name, description } = sborExtractor
+                    .getWithSchema(
+                        s.structNullable({
+                            key_image_url: s.string(),
+                            name: s.string(),
+                            description: s.string(),
+                        })
+                    )
+                    .unwrapOr({
+                        key_image_url: null,
+                        name: null,
+                        description: null,
+                    });
                 return {
                     id: item.non_fungible_id,
-                    keyImageUrl,
-                    name,
-                    description,
+                    keyImageUrl: key_image_url,
+                    name: name,
+                    description: description,
+                    nftData: sborExtractor,
                 };
             });
 
@@ -103,6 +165,5 @@ export async function getNonFungibleBalancesForAccount(
             } as NftBalance;
         })();
     });
-
     return Promise.all(nonFungibleResults);
 }
