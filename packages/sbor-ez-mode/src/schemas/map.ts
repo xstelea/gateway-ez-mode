@@ -1,33 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     ProgrammaticScryptoSborValue,
     ProgrammaticScryptoSborValueMap,
 } from '@radixdlt/babylon-gateway-api-sdk';
 import { SborError, SborSchema } from '../sborSchema';
-import { ParsedType } from './struct';
 
-export interface MapDefinition {
-    key: SborSchema<any>;
-    value: SborSchema<any>;
+export interface MapDefinition<T, U> {
+    key: SborSchema<T>;
+    value: SborSchema<U>;
 }
 
-// export type MapDefinition = Map<any, any>
+export class MapSchema<K, V> extends SborSchema<Map<K, V>> {
+    private definition: MapDefinition<K, V>;
 
-export type MapParsedType<T extends MapDefinition> = {
-    key: ParsedType<T['key']>;
-    value: ParsedType<T['value']>;
-};
-
-export class MapSchema<T extends MapDefinition> extends SborSchema<
-    // {
-    //     key: ParsedType<T['key']>;
-    //     value: ParsedType<T['value']>;
-    // }[]
-    Map<ParsedType<T['key']>, ParsedType<T['value']>>
-> {
-    private definition: T;
-
-    constructor(definition: T) {
+    constructor(definition: MapDefinition<K, V>) {
         super(['Map']);
         this.definition = definition;
     }
@@ -65,15 +50,12 @@ export class MapSchema<T extends MapDefinition> extends SborSchema<
         });
     }
 
-    parse(
-        value: ProgrammaticScryptoSborValue,
-        path: string[]
-    ): Map<ParsedType<T['key']>, ParsedType<T['value']>> {
+    parse(value: ProgrammaticScryptoSborValue, path: string[]): Map<K, V> {
         this.validate(value, path);
         const mapValue = value as ProgrammaticScryptoSborValueMap;
         const entries = mapValue.entries;
 
-        return new Map(
+        return new Map<K, V>(
             entries.map((entry, index) => [
                 this.definition.key.parse(entry.key, [
                     ...path,

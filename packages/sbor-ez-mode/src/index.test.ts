@@ -1,25 +1,106 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it } from 'vitest';
-import { boingEvents, complex } from './programatic-json';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { s } from './factory';
 import { ProgrammaticScryptoSborValue } from '@radixdlt/babylon-gateway-api-sdk';
-import { SborSchema } from './sborSchema';
+import { SborError, SborSchema } from './sborSchema';
+import { Result } from 'neverthrow';
 
-function evaluateResultHelper<S extends SborSchema<any>, E>(
-    schema: S,
+function evaluateResultHelper<T, E>(
+    schema: SborSchema<T>,
     example: ProgrammaticScryptoSborValue,
     expectedParsedValue: E
-) {
+): T {
     const result = schema.safeParse(example);
     if (result.isOk()) {
         expect(result.value).toEqual(expectedParsedValue);
+        return result.value;
     } else {
+        console.error(result.error);
         throw new Error('Failed to parse');
     }
 }
 
 describe('sbor', () => {
-    it('parse a complex example', () => {
+    it('parse a complex structure', () => {
+        const example: ProgrammaticScryptoSborValue = {
+            fields: [
+                {
+                    element_kind: 'Tuple',
+                    elements: [
+                        {
+                            fields: [
+                                {
+                                    value: 'XRP/USD',
+                                    kind: 'String',
+                                },
+                                {
+                                    fields: [
+                                        {
+                                            value: '4.182833800936179164',
+                                            kind: 'Decimal',
+                                            field_name: 'oi_long',
+                                        },
+                                        {
+                                            value: '3.628419587417141536',
+                                            kind: 'Decimal',
+                                            field_name: 'oi_short',
+                                        },
+                                        {
+                                            value: '1.370474241159020676',
+                                            kind: 'Decimal',
+                                            field_name: 'cost',
+                                        },
+                                        {
+                                            value: '1.222607230209630933',
+                                            kind: 'Decimal',
+                                            field_name: 'skew_abs_snap',
+                                        },
+                                        {
+                                            value: '0.147867010949389743',
+                                            kind: 'Decimal',
+                                            field_name: 'pnl_snap',
+                                        },
+                                        {
+                                            value: '-6.209391626742886295',
+                                            kind: 'Decimal',
+                                            field_name: 'funding_2_rate',
+                                        },
+                                        {
+                                            value: '-11043086051690144.381798536004162019',
+                                            kind: 'Decimal',
+                                            field_name: 'funding_long_index',
+                                        },
+                                        {
+                                            value: '-12.721663589564077452',
+                                            kind: 'Decimal',
+                                            field_name: 'funding_short_index',
+                                        },
+                                        {
+                                            value: '1741797196',
+                                            kind: 'I64',
+                                            type_name: 'Instant',
+                                            field_name: 'last_update',
+                                        },
+                                        {
+                                            value: '2.20522346',
+                                            kind: 'Decimal',
+                                            field_name: 'last_price',
+                                        },
+                                    ],
+                                    kind: 'Tuple',
+                                    type_name: 'PoolPosition',
+                                },
+                            ],
+                            kind: 'Tuple',
+                        },
+                    ],
+                    kind: 'Array',
+                    field_name: 'updates',
+                },
+            ],
+            kind: 'Tuple',
+            type_name: 'EventPairUpdates',
+        };
+
         const schema = s.struct({
             updates: s.array(
                 s.tuple([
@@ -38,15 +119,44 @@ describe('sbor', () => {
             ),
         });
 
-        const result = schema.safeParse(complex);
+        const parsed = {
+            updates: [
+                [
+                    'XRP/USD',
+                    {
+                        oi_long: '4.182833800936179164',
+                        oi_short: '3.628419587417141536',
+                        cost: '1.370474241159020676',
+                        skew_abs_snap: '1.222607230209630933',
+                        pnl_snap: '0.147867010949389743',
+                        funding_2_rate: '-6.209391626742886295',
+                        funding_long_index:
+                            '-11043086051690144.381798536004162019',
+                        last_update: 1741797196,
+                    },
+                ],
+            ],
+        };
 
-        if (result.isOk()) {
-            result.value.updates.forEach((update) => {
-                console.log(update[1]);
-            });
-        } else {
-            throw new Error('Failed to parse');
-        }
+        type expectedType = {
+            updates: [
+                string,
+                {
+                    oi_long: string;
+                    oi_short: string;
+                    cost: string;
+                    skew_abs_snap: string;
+                    pnl_snap: string;
+                    funding_2_rate: string;
+                    funding_long_index: string;
+                    last_update: number;
+                },
+            ][];
+        };
+
+        const result = evaluateResultHelper(schema, example, parsed);
+
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a struct', () => {
@@ -102,7 +212,14 @@ describe('sbor', () => {
             is_success: true,
         };
 
-        evaluateResultHelper(swapEventSchema, example, parsed);
+        const result = evaluateResultHelper(swapEventSchema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<{
+            input_address: string;
+            input_amount: string;
+            output_address: string;
+            output_amount: string;
+            is_success: boolean;
+        }>();
     });
 
     it('parse a nullable struct', () => {
@@ -136,7 +253,15 @@ describe('sbor', () => {
             boing: s.string(),
         });
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = {
+            foo: string | null;
+            bar: string | null;
+            boing: string | null;
+        };
+
+        const result = evaluateResultHelper(schema, example, parsed);
+
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a nullable struct where the value is present', () => {
@@ -175,10 +300,120 @@ describe('sbor', () => {
             boing: s.string(),
         });
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = {
+            foo: string | null;
+            bar: string | null;
+            boing: string | null;
+        };
+
+        const result = evaluateResultHelper(schema, example, parsed);
+
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse an enum', () => {
+        const boingEvents: ProgrammaticScryptoSborValue[] = [
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '0',
+                variant_name: 'Empty',
+                fields: [],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '1',
+                variant_name: 'StructBased',
+                fields: [
+                    {
+                        kind: 'String',
+                        field_name: 'name',
+                        value: 'daan',
+                    },
+                ],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '2',
+                variant_name: 'StructBasedEmpty',
+                fields: [],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '3',
+                variant_name: 'TupleBased',
+                fields: [
+                    {
+                        kind: 'String',
+                        value: 'daan',
+                    },
+                ],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '4',
+                variant_name: 'TupleBasedTwoVals',
+                fields: [
+                    {
+                        kind: 'String',
+                        value: 'daan',
+                    },
+                    {
+                        kind: 'U32',
+                        value: '5',
+                    },
+                ],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '5',
+                variant_name: 'TupleBasedEmpty',
+                fields: [],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '6',
+                variant_name: 'ContainsOption',
+                fields: [
+                    {
+                        field_name: 'option',
+                        kind: 'Enum',
+                        type_name: 'Option',
+                        variant_id: '0',
+                        variant_name: 'None',
+                        fields: [],
+                    },
+                ],
+            },
+            {
+                kind: 'Enum',
+                type_name: 'BoingEvent',
+                variant_id: '6',
+                variant_name: 'ContainsOption',
+                fields: [
+                    {
+                        field_name: 'option',
+                        kind: 'Enum',
+                        type_name: 'Option',
+                        variant_id: '1',
+                        variant_name: 'Some',
+                        fields: [
+                            {
+                                kind: 'String',
+                                value: 'daan',
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
         const schema = s.enum([
             {
                 variant: 'Empty',
@@ -214,13 +449,53 @@ describe('sbor', () => {
             },
         ]);
 
+        type expectedType =
+            | {
+                  variant: 'Empty';
+                  value: [];
+              }
+            | {
+                  variant: 'StructBased';
+                  value: {
+                      name: string;
+                  };
+              }
+            | {
+                  variant: 'StructBasedEmpty';
+                  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+                  value: {};
+              }
+            | {
+                  variant: 'TupleBased';
+                  value: [string];
+              }
+            | {
+                  variant: 'TupleBasedTwoVals';
+                  value: [string, number];
+              }
+            | {
+                  variant: 'TupleBasedEmpty';
+                  value: [];
+              }
+            | {
+                  variant: 'ContainsOption';
+                  value: {
+                      option:
+                          | {
+                                variant: 'None';
+                            }
+                          | {
+                                variant: 'Some';
+                                value: string;
+                            };
+                  };
+              };
+
         boingEvents.forEach((event) => {
             const result = schema.safeParse(event);
-            if (result.isOk()) {
-                console.log(result.value);
-            } else {
-                throw new Error('Failed to parse');
-            }
+            expectTypeOf(result).toEqualTypeOf<
+                Result<expectedType, SborError>
+            >();
         });
     });
 
@@ -262,7 +537,12 @@ describe('sbor', () => {
             key: s.string(),
             value: s.string(),
         });
-        evaluateResultHelper(schema, example, parsed);
+
+        type expectedType = Map<string, string>;
+
+        const result = evaluateResultHelper(schema, example, parsed);
+
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a kvs address (Own)', () => {
@@ -278,7 +558,10 @@ describe('sbor', () => {
 
         const schema = s.internalAddress();
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = string;
+
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a tuple', () => {
@@ -300,7 +583,10 @@ describe('sbor', () => {
         const parsed = ['hello', 5];
         const schema = s.tuple([s.string(), s.number()]);
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = [string, number];
+
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a very nested tuple', () => {
@@ -351,17 +637,14 @@ describe('sbor', () => {
             s.tuple([s.string(), s.number()]),
         ]);
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = [[string, number], [string, number]];
+
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse all possible variants of an enum', () => {
         const examples: ProgrammaticScryptoSborValue[] = [
-            {
-                kind: 'Enum',
-                variant_id: '0',
-                variant_name: 'Empty',
-                fields: [],
-            },
             {
                 kind: 'Enum',
                 variant_id: '1',
@@ -378,6 +661,12 @@ describe('sbor', () => {
                 kind: 'Enum',
                 variant_id: '2',
                 variant_name: 'StructBasedEmpty',
+                fields: [],
+            },
+            {
+                kind: 'Enum',
+                variant_id: '5',
+                variant_name: 'TupleBasedEmpty',
                 fields: [],
             },
             {
@@ -405,12 +694,6 @@ describe('sbor', () => {
                         value: '5',
                     },
                 ],
-            },
-            {
-                kind: 'Enum',
-                variant_id: '5',
-                variant_name: 'TupleBasedEmpty',
-                fields: [],
             },
             // this one is an enum at the top level, but also contains an option which
             // is also an enum
@@ -452,10 +735,6 @@ describe('sbor', () => {
         ];
         const schema = s.enum([
             {
-                variant: 'Empty',
-                schema: s.tuple([]),
-            },
-            {
                 variant: 'StructBased',
                 schema: s.struct({
                     name: s.string(),
@@ -486,12 +765,11 @@ describe('sbor', () => {
         ]);
 
         const parsed = [
-            { variant: 'Empty', value: [] },
             { variant: 'StructBased', value: { name: 'daan' } },
             { variant: 'StructBasedEmpty', value: {} },
+            { variant: 'TupleBasedEmpty', value: [] },
             { variant: 'TupleBased', value: ['daan'] },
             { variant: 'TupleBasedTwoVals', value: ['daan', 5] },
-            { variant: 'TupleBasedEmpty', value: [] },
             {
                 variant: 'ContainsOption',
                 value: { option: { variant: 'None' } },
@@ -502,8 +780,45 @@ describe('sbor', () => {
             },
         ];
 
+        type expectedType =
+            | {
+                  variant: 'StructBased';
+                  value: {
+                      name: string;
+                  };
+              }
+            | {
+                  variant: 'TupleBasedEmpty';
+                  value: [];
+              }
+            | {
+                  variant: 'StructBasedEmpty';
+                  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+                  value: {};
+              }
+            | {
+                  variant: 'TupleBased';
+                  value: [string];
+              }
+            | {
+                  variant: 'TupleBasedTwoVals';
+                  value: [string, number];
+              }
+            | {
+                  variant: 'ContainsOption';
+                  value: {
+                      option:
+                          | {
+                                variant: 'Some';
+                                value: string;
+                            }
+                          | { variant: 'None' };
+                  };
+              };
+
         examples.forEach((example, i) => {
-            evaluateResultHelper(schema, example, parsed[i]);
+            const result = evaluateResultHelper(schema, example, parsed[i]);
+            expectTypeOf(result).toEqualTypeOf<expectedType>();
         });
     });
 
@@ -518,7 +833,8 @@ describe('sbor', () => {
         const parsed = new Date(Date.parse('2025-03-11T17:08:49.000Z'));
 
         const schema = s.instant();
-        evaluateResultHelper(schema, example, parsed);
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<Date>();
     });
 
     it('parse a None', () => {
@@ -534,7 +850,18 @@ describe('sbor', () => {
         };
 
         const schema = s.option(s.string());
-        evaluateResultHelper(schema, example, parsed);
+
+        type expectedType =
+            | {
+                  variant: 'Some';
+                  value: string;
+              }
+            | {
+                  variant: 'None';
+              };
+
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse a Some', () => {
@@ -568,7 +895,18 @@ describe('sbor', () => {
                 boing: s.string(),
             })
         );
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType =
+            | {
+                  variant: 'Some';
+                  value: {
+                      boing: string;
+                  };
+              }
+            | {
+                  variant: 'None';
+              };
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 
     it('parse an array of non fungible local ids', () => {
@@ -595,7 +933,10 @@ describe('sbor', () => {
         const parsed = ['#1#', '#2#', '#3#'];
         const schema = s.array(s.nonFungibleLocalId());
 
-        evaluateResultHelper(schema, example, parsed);
+        type expectedType = string[];
+
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
     it('parse a multi-layered structure of doom', () => {
         const schema = s.tuple([
@@ -779,6 +1120,43 @@ describe('sbor', () => {
             ],
         ];
 
-        evaluateResultHelper(schema, example, expectedParsedValue);
+        type expectedType = [
+            {
+                name: string;
+                complicated_array: [
+                    string,
+                    (
+                        | {
+                              variant: 'StructBased';
+                              value: {
+                                  inner_name: string;
+                                  inner_value: number;
+                              };
+                          }
+                        | {
+                              variant: 'Empty';
+                              value: [];
+                          }
+                    ),
+                    boolean,
+                ][];
+            },
+            (
+                | {
+                      variant: 'HiddenMessage';
+                      value: [string];
+                  }
+                | {
+                      variant: 'LuckyNumber';
+                      value: [number];
+                  }
+            )[],
+        ];
+        const result = evaluateResultHelper(
+            schema,
+            example,
+            expectedParsedValue
+        );
+        expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
 });

@@ -18,10 +18,10 @@
   "license": "MIT",
   "description": "Some higher-level abstractions on top of the Radix Babylon Gateway TypeScript SDK",
   "devDependencies": {
+    "@calamari-radix/eslint-config": "workspace:*",
     "@radixdlt/radix-engine-toolkit": "^1.0.5",
     "@types/luxon": "^3.4.2",
     "eslint": "^9.21.0",
-    "@calamari-radix/eslint-config": "workspace:*",
     "luxon": "^3.5.0",
     "typescript": "5.7.3",
     "vitest": "^3.0.7"
@@ -30,7 +30,8 @@
     "access": "public"
   },
   "dependencies": {
+    "@calamari-radix/sbor-ez-mode": "workspace:*",
     "@radixdlt/babylon-gateway-api-sdk": "^1.10.0",
-    "@calamari-radix/sbor-ez-mode": "workspace:*"
+    "neverthrow": "^8.2.0"
   }
 }

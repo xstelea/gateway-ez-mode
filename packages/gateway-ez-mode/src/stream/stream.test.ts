@@ -10,7 +10,7 @@ describe(
             const TO_STATE_VERSION = 242189250;
             const gateway = new GatewayEzMode();
 
-            const stream = await gateway.getTransactionStream({
+            const stream = await gateway.stream.getTransactionStream({
                 startStateVersion: FROM_STATE_VERSION,
                 batchSize: 100,
             });

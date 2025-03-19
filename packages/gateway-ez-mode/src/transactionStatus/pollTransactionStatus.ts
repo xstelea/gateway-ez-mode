@@ -48,6 +48,8 @@ export type PollTransactionStatusOptions = Partial<{
  * @param transactionId - The ID of the transaction to poll.
  * @param options - Options for the polling.
  * @returns A promise that resolves to the transaction status.
+ * @throws {TransactionPollingAbortedError} If the polling is aborted.
+ * @throws {TransactionPollingTimeoutError} If the polling times out.
  */
 export const pollTransactionStatus = (
     transactionId: string,

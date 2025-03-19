@@ -1,24 +1,13 @@
-import {
-    GatewayApiClient,
-    TransactionStatusResponse,
-} from '@radixdlt/babylon-gateway-api-sdk';
-import { Account } from './account';
-import {
-    PollTransactionStatusOptions,
-    pollTransactionStatus,
-} from './transactionStatus/pollTransactionStatus';
+import { GatewayApiClient } from '@radixdlt/babylon-gateway-api-sdk';
 import { defaultGatewayClient } from './gatewayClient';
-import {
-    TransactionStream,
-    TransactionStreamInput,
-} from './stream/transactionStream';
 
 import s from '@calamari-radix/sbor-ez-mode';
-export { s };
+import { StateService } from './services/state';
+import { DomainService } from './services/domain';
+import { StatusService } from './services/status';
+import { TransactionService } from './services/transaction';
+import { StreamService } from './services/stream';
 
-type GetTransactionStreamInput = Partial<
-    Omit<TransactionStreamInput, 'gateway' | 'stateVersionManager'>
->;
 /**
  * A wrapper around the GatewayApiClient that provides
  * a more user-friendly interface for common tasks.
@@ -31,6 +20,27 @@ export class GatewayEzMode {
     gateway: GatewayApiClient;
 
     /**
+     * A service for querying state-related data.
+     */
+    state: StateService;
+    /**
+     * A service for querying information related to XRD Domains.
+     */
+    domains: DomainService;
+    /**
+     * A service for querying gateway or netrowk status.
+     */
+    status: StatusService;
+    /**
+     * A service for transaction-related operations.
+     */
+    transaction: TransactionService;
+    /**
+     * A service related to streaming transaction data.
+     */
+    stream: StreamService;
+
+    /**
      * Creates a new GatewayEzMode instance.
      * @param gateway Optional GatewayApiClient instance to use for API calls.
      */
@@ -40,60 +50,14 @@ export class GatewayEzMode {
         } else {
             this.gateway = defaultGatewayClient();
         }
-    }
-
-    /**
-     * Instantiates an account object for the given address.
-     * @param address The Account address of the account to instantiate an object for.
-     * @returns An Account object for the given address.
-     */
-    getAccount(address: string): Account {
-        return new Account(address, this.gateway);
-    }
-
-    /**
-     * Poll the status of a transaction until it is in a 'final' state, either failed or succeeded.
-     * @param transactionId The transaction id / intent hash of the transaction to poll.
-     * @param options Options for polling.
-     * @returns A promise that resolves with the transaction
-     * status as soon as the transaction is in a final state.
-     *
-     * @example
-     * ```typescript
-     * const transactionId = sendTransaction();
-     * let transactionStatus;
-     * try {
-     *   transactionStatus = await gatewayEzMode.pollTransactionStatus(transactionId);
-     * } catch (error) {
-     *   console.error('Failed polling:', error);
-     * }
-     * console.log("Transaction resolved with status:", transactionStatus);
-     * ```
-     */
-    pollTransactionStatus(
-        transactionId: string,
-        options?: Omit<PollTransactionStatusOptions, 'gatewayApiClient'>
-    ): Promise<TransactionStatusResponse> {
-        return pollTransactionStatus(transactionId, {
-            ...(options || {}),
-            gatewayApiClient: this.gateway,
-        });
-    }
-
-    /**
-     *
-     * @param startStateVersion The state version to start streaming from.
-     * @param batchSize The maximum number of transactions to fetch per call.
-     * @returns A promise that resolves with a TransactionStream class instance.
-     */
-    async getTransactionStream({
-        startStateVersion,
-        batchSize,
-    }: GetTransactionStreamInput): Promise<TransactionStream> {
-        return TransactionStream.create({
-            gateway: this.gateway,
-            startStateVersion,
-            batchSize,
-        });
+        this.state = new StateService(this.gateway);
+        this.domains = new DomainService(this.state);
+        this.status = new StatusService(this.gateway);
+        this.transaction = new TransactionService(this.gateway);
+        this.stream = new StreamService(this.gateway);
     }
 }
+
+export { s };
+export { MetadataExtractor } from './data_extractors/metadata';
+export * from './error';

@@ -8,6 +8,8 @@ The simple way to parse Programmatic JSON into nice JavaScript objects with an a
 npm install @calamari-radix/sbor-ez-mode
 ```
 
+## Warning: The APIs in this repository may not be stable and could be changed at any time.
+
 ## Usage
 
 ## Parsing ProgrammaticScryptoSborValue

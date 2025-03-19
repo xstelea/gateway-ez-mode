@@ -95,7 +95,8 @@ describe('transactionPoller', () => {
 
             try {
                 console.log('Sending txn with intent hash:', intentHash);
-                const status = await gateway.pollTransactionStatus(intentHash);
+                const status =
+                    await gateway.transaction.pollTransactionStatus(intentHash);
                 console.log('Successfully got transaction status:', status);
             } catch (status) {
                 console.warn('thrown while polling txn status:', status);
