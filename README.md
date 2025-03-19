@@ -4,6 +4,8 @@ Some helpers for interfacing with the Radix network.
 
 All devs in Radix, whether frontend or backend, surely have written helpers that make it easier to fetch data from the Radix Gateway. While Radix some great SDKs, sometimes you just want a very simple thing like get an account's balances. This repository is a collection of these helpers. Feel free to contribute!
 
+## Warning: The APIs in this repository may not be stable and could be changed at any time.
+
 ## Packages
 
 - `gateway-ez-mode`
