@@ -18,8 +18,8 @@ Find it on [NPM](https://www.npmjs.com/package/@calamari-radix/gateway-ez-mode)
 
 ```ts
 const gateway = new GatewayEzMode();
-const account = gateway.getAccount(SOME_RANDOM_ACCOUNT);
-const fungibleBalances = await account.getFungibleBalances();
+const fungibleBalances =
+    await gateway.getFungibleBalancesForComponent(SOME_RANDOM_ACCOUNT);
 console.log(fungibleBalances);
 
 /*
@@ -39,7 +39,8 @@ output:
 ]
 */
 
-const nftBalances = await account.getNftBalances();
+const nftBalances =
+    await gateway.getComponentNonFungibleBalances(SOME_RANDOM_ACCOUNT);
 console.log(nftBalances);
 
 /*
