@@ -18,6 +18,10 @@ The Radix network uses a custom data serialization standard called Scrypto SBOR 
 
 This package contains a library inspired by the popular validation library Zod, that makes it easy to write TypeScript schemas for your Scrypto types and parse them into nice javascript objects, arrays, maps etc in one go.
 
+### A note on error handling
+
+This package uses [neverthrow](https://github.com/supermacro/neverthrow)'s `Result` type for error handling. This means that the result of a safeParse operation will always be a `Result` object, which can be either `Ok` or `Err`. You can check if the result is `Ok` or `Err` and then access the value or error accordingly. For more information on how to use the Result type, please refer to the neverthrow documentation.
+
 ### A simple example:
 
 ```ts
@@ -88,20 +92,12 @@ Scrypto SBOR does not have a Struct Kind natively, it is represented by Tuple.
 Now we can parse this programmatic JSON into our nice schema:
 
 ```ts
+// The return type is `neverthrow`'s `Result` type, which you can nicely handle
+// in a lot of ways.
 const result = swapEventSchema.safeParse(example);
 
-// {
-//   success: true,
-//   data: ...
-// }
-// or
-// {
-//   success: false,
-//   error: ...
-// }
-
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 // {
 //     input_address: 'resource_rdx1t5py...',
@@ -146,8 +142,8 @@ const example: ProgrammaticScryptoSborValue = {
 const schema = s.array(s.nonFungibleLocalId());
 const result = schema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // ['#1#', '#2#', '#3#'];
@@ -200,8 +196,8 @@ const schema = s.map({
 
 const result = schema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // Map(2) { 'boinoing' => 'boobies', 'impostor' => 'amogus' }
@@ -235,8 +231,8 @@ const example: ProgrammaticScryptoSborValue = {
 const schema = s.tuple([s.string(), s.number()]);
 const result = schema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // ['hello', 5];
@@ -303,8 +299,8 @@ Now we can parse this programmatic JSON into our nice schema:
 ```ts
 const result = myEnumSchema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // {
@@ -340,8 +336,8 @@ const schema = s.option(s.string());
 
 const result = schema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // { variant: 'None' }
@@ -371,8 +367,8 @@ const schema = s.option(s.bool());
 
 const result = schema.safeParse(example);
 
-if (result.success) {
-    console.log(result.data);
+if (result.isOk()) {
+    console.log(result.value);
 }
 
 // { variant: 'Some', value: true }
