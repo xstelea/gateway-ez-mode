@@ -1,5 +1,32 @@
 # @calamari-radix/gateway-ez-mode
 
+## 1.6.0
+
+### Minor Changes
+
+- c9ad5a3: Updated metadata extraction by introducing a more generic metadata extraction framework with nice type inference, and refactor some of the resource info fetching functions to use this new method.
+  Updated ResourceInfo interface to include functions to fetch metadata, which enables users to fetch custom metadata other than the default ones provided in the metadata standard, which were already included in that object.
+- 9fc6736: Improved structure:
+
+    - removed some unnecessary abstraction layers and introduced a familiar design which the regular gateway SDK also uses, with different services which are responsible for different uses.
+
+    Improved error handling:
+
+    - Added and exported some custom errors which are thrown by the services, so that the user can catch them and handle them as they see fit. Documentation has been added to the methods of each service to explain what errors can be thrown and why.
+
+    New features:
+
+    - Easily getting the current state version of the Radix network
+    - Easily getting the current epoch of the Radix network
+    - Easily getting XRD domains owned by a component (or account)
+
+### Patch Changes
+
+- Updated dependencies [30be698]
+- Updated dependencies [9fc6736]
+- Updated dependencies [92864ef]
+    - @calamari-radix/sbor-ez-mode@1.1.0
+
 ## 1.5.0
 
 ### Minor Changes
