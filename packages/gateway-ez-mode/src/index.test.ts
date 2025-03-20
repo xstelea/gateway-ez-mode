@@ -8,6 +8,8 @@ const SOME_RANDOM_ACCOUNT =
     'account_rdx1cx26ckdep9t0lut3qaz3q8cj9wey3tdee0rdxhc5f0nce64lw5gt70';
 const DELETED_RATTA_ACCOUNT =
     'account_rdx12xru8aww4w73rr7r3wrc9nk428jr93efxvwtazen7hs3u43cyl5ssv';
+const ALLEGED_BURN_ACCOUNT =
+    'account_rdx16998xell0000000000000000000000000000000000000000000000';
 
 const prettyPrint = (obj: any) => console.log(JSON.stringify(obj, null, 2));
 
@@ -74,8 +76,9 @@ describe('gatewaySdk', () => {
         const gateway = new GatewayEzMode();
         const balances =
             await gateway.state.getComponentNonFungibleBalances(
-                SOME_RANDOM_ACCOUNT
+                ALLEGED_BURN_ACCOUNT
             );
+        console.log(balances);
         prettyPrint(balances[0]);
         const nftData = balances[0].nftBalance[0].nftData.getWithSchema(
             s.structNullable({
