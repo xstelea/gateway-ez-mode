@@ -25,8 +25,7 @@
   },
   "dependencies": {
     "@radixdlt/babylon-gateway-api-sdk": "^1.10.0",
-    "neverthrow": "^8.2.0",
-    "zod": "^3.24.2"
+    "neverthrow": "^8.2.0"
   },
   "publishConfig": {
     "access": "public"
