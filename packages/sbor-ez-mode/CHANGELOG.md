@@ -1,5 +1,11 @@
 # @calamari-radix/sbor-ez-mode
 
+## 1.2.0
+
+### Minor Changes
+
+- 7bea651: Added an s.infer utility type, which can be used to infer the parsed type from a schema, very similar to zod
+
 ## 1.1.0
 
 ### Minor Changes
