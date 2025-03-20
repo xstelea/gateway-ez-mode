@@ -211,15 +211,21 @@ describe('sbor', () => {
             output_amount: '522.23800528105807128',
             is_success: true,
         };
-
         const result = evaluateResultHelper(swapEventSchema, example, parsed);
-        expectTypeOf(result).toEqualTypeOf<{
+
+        type resultType = {
             input_address: string;
             input_amount: string;
             output_address: string;
             output_amount: string;
             is_success: boolean;
-        }>();
+        };
+        expectTypeOf(result).toEqualTypeOf<resultType>();
+
+        // infer the result using s.infer
+        type inferredResultType = s.infer<typeof swapEventSchema>;
+        // check whether the inferred result is the same as the expected result
+        expectTypeOf<resultType>().toEqualTypeOf<inferredResultType>();
     });
 
     it('parse a nullable struct', () => {

@@ -213,3 +213,21 @@ export const s = {
     map: <K, V>(definition: MapDefinition<K, V>) =>
         new MapSchema<K, V>(definition),
 };
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace s {
+    /**
+     * A utility type that extracts the parsed type from a schema.
+     * @example
+     * ```ts
+     * const myStructSchema = s.struct({
+     *   bing: s.string(),
+     *   bong: s.number(),
+     *   foo: s.struct({ bar: s.string() }),
+     * });
+     * type MyStruct = s.infer<typeof myStructSchema>;
+     * ```
+     */
+    export type infer<T extends SborSchema<any>> =
+        T extends SborSchema<infer R> ? R : never;
+}
