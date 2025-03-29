@@ -1,5 +1,11 @@
 # @calamari-radix/sbor-ez-mode
 
+## 1.2.1
+
+### Patch Changes
+
+- 82fd7be: Fixed a bug where it was impossible to parse PreciseDecimal types
+
 ## 1.2.0
 
 ### Minor Changes
