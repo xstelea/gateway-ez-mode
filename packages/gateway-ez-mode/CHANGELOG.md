@@ -1,5 +1,12 @@
 # @calamari-radix/gateway-ez-mode
 
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [82fd7be]
+    - @calamari-radix/sbor-ez-mode@1.2.1
+
 ## 1.6.1
 
 ### Patch Changes
