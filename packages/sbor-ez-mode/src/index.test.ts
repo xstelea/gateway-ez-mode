@@ -1165,4 +1165,16 @@ describe('sbor', () => {
         );
         expectTypeOf(result).toEqualTypeOf<expectedType>();
     });
+
+    it('parse a PreciseDecimal', () => {
+        const example: ProgrammaticScryptoSborValue = {
+            kind: 'PreciseDecimal',
+            value: '123.456',
+        };
+
+        const parsed = '123.456';
+        const schema = s.decimal();
+        const result = evaluateResultHelper(schema, example, parsed);
+        expectTypeOf(result).toEqualTypeOf<string>();
+    });
 });
