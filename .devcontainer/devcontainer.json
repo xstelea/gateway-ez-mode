@@ -7,8 +7,14 @@
         "JoshMu.periscope",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "rust-lang.rust-analyzer"
       ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "1.84"
     }
   }
 }

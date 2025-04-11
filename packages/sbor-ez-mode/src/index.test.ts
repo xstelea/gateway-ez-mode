@@ -1177,4 +1177,486 @@ describe('sbor', () => {
         const result = evaluateResultHelper(schema, example, parsed);
         expectTypeOf(result).toEqualTypeOf<string>();
     });
+
+    it('testing generated schema of ociswap precisionpool', () => {
+        const example: ProgrammaticScryptoSborValue = {
+            kind: 'Tuple',
+            type_name: 'PrecisionPool',
+            fields: [
+                {
+                    kind: 'Reference',
+                    type_name: 'ComponentAddress',
+                    field_name: 'pool_address',
+                    value: 'component_rdx1cp6fus3tmgfddxvfksn9ng8nh7rd0zqyarl3pgvatzfcwdzuq4nvst',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'x_liquidity',
+                    value: 'internal_vault_rdx1tpf4j3xrdvlmmhdk4232gmy65n2dvhuygzj2ufp7jvlkqkr3k70tdx',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'y_liquidity',
+                    value: 'internal_vault_rdx1trk0j6gasw0a0a8vm8reegfm2arj27rapmffjxdjzfsg23vctmuapn',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'x_fees',
+                    value: 'internal_vault_rdx1trgsrylgw9uj8atmepytjtxder25kawa70dq3fgcctp6hy85lcjq46',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'y_fees',
+                    value: 'internal_vault_rdx1trt36r2ypsa2d6nkv6m3ynwhfvduqyj69wwp0f0ac9ax2ykl3uq7ue',
+                },
+                {
+                    kind: 'U32',
+                    field_name: 'tick_spacing',
+                    value: '60',
+                },
+                {
+                    kind: 'PreciseDecimal',
+                    field_name: 'max_liquidity_per_tick',
+                    value: '106125742744311269.65457311918850380388841927303465765',
+                },
+                {
+                    kind: 'PreciseDecimal',
+                    field_name: 'price_sqrt',
+                    value: '0.170709179821498589523144422307580686',
+                },
+                {
+                    kind: 'Enum',
+                    type_name: 'Option',
+                    field_name: 'active_tick',
+                    variant_id: '1',
+                    variant_name: 'Some',
+                    fields: [
+                        {
+                            kind: 'I32',
+                            value: '-40440',
+                        },
+                    ],
+                },
+                {
+                    kind: 'PreciseDecimal',
+                    field_name: 'active_liquidity',
+                    value: '2601629.738964659409787981546051466255292134',
+                },
+                {
+                    kind: 'Reference',
+                    type_name: 'ResourceAddress',
+                    field_name: 'lp_manager',
+                    value: 'resource_rdx1ngv3qc6st8a8fexnqz23nl0ggnydup2a6zaultldushkpxrtmm02up',
+                },
+                {
+                    kind: 'U64',
+                    field_name: 'lp_counter',
+                    value: '34',
+                },
+                {
+                    kind: 'Tuple',
+                    type_name: 'AvlTree',
+                    field_name: 'ticks',
+                    fields: [
+                        {
+                            kind: 'Enum',
+                            type_name: 'Option',
+                            field_name: 'root',
+                            variant_id: '1',
+                            variant_name: 'Some',
+                            fields: [
+                                {
+                                    kind: 'I32',
+                                    value: '-31440',
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Own',
+                            type_name: 'KeyValueStore',
+                            field_name: 'store',
+                            value: 'internal_keyvaluestore_rdx1kplayw0a626grcr6whuxzsw84stykvh9cp0znadg5adxjxmafl3zf3',
+                        },
+                        {
+                            kind: 'Map',
+                            field_name: 'store_cache',
+                            key_kind: 'I32',
+                            value_kind: 'Tuple',
+                            value_type_name: 'Node',
+                            entries: [],
+                        },
+                    ],
+                },
+                {
+                    kind: 'Reference',
+                    type_name: 'ComponentAddress',
+                    field_name: 'registry',
+                    value: 'component_rdx1crdy3ut4f78nxjpum37kl0682nq0vee9ntwrz8eg7mtxe8kyanwjmv',
+                },
+                {
+                    kind: 'U64',
+                    field_name: 'next_sync_time',
+                    value: '1743802966',
+                },
+                {
+                    kind: 'Decimal',
+                    field_name: 'input_fee_rate',
+                    value: '0.01',
+                },
+                {
+                    kind: 'Decimal',
+                    field_name: 'fee_protocol_share',
+                    value: '0.1',
+                },
+                {
+                    kind: 'PreciseDecimal',
+                    field_name: 'x_lp_fee',
+                    value: '0.268161448946111888032739450603034827',
+                },
+                {
+                    kind: 'PreciseDecimal',
+                    field_name: 'y_lp_fee',
+                    value: '0.009030772719485233115495696611069994',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'x_protocol_fee',
+                    value: 'internal_vault_rdx1tqksgqvrhnhtl599fv4d5pd93xmadptxslkw8uyn6zzq6dke45xdt4',
+                },
+                {
+                    kind: 'Own',
+                    type_name: 'Vault',
+                    field_name: 'y_protocol_fee',
+                    value: 'internal_vault_rdx1tz8yuffczg9zmkkjaut0hr5zel7n5rehqne7xcalwf0knl5dlr59p6',
+                },
+                {
+                    kind: 'U64',
+                    field_name: 'instantiated_at',
+                    value: '1727451450',
+                },
+                {
+                    kind: 'Reference',
+                    type_name: 'ResourceAddress',
+                    field_name: 'flash_manager',
+                    value: 'resource_rdx1nfy368dkh3emwtplg4vpgrpyvpcch0sezytp93fea0zjqup9tj2z3u',
+                },
+                {
+                    kind: 'Decimal',
+                    field_name: 'flash_loan_fee_rate',
+                    value: '0.009',
+                },
+                {
+                    kind: 'Map',
+                    field_name: 'hooks',
+                    key_kind: 'Tuple',
+                    value_kind: 'Reference',
+                    value_type_name: 'ComponentAddress',
+                    entries: [],
+                },
+                {
+                    kind: 'Tuple',
+                    type_name: 'HookCalls',
+                    field_name: 'hook_calls',
+                    fields: [
+                        {
+                            kind: 'Tuple',
+                            field_name: 'before_instantiate',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'before_instantiate',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'after_instantiate',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'after_instantiate',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'before_add_liquidity',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'before_add_liquidity',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'after_add_liquidity',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'after_add_liquidity',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'before_swap',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'before_swap',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'after_swap',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'after_swap',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'before_remove_liquidity',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'before_remove_liquidity',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'Tuple',
+                            field_name: 'after_remove_liquidity',
+                            fields: [
+                                {
+                                    kind: 'String',
+                                    value: 'after_remove_liquidity',
+                                },
+                                {
+                                    kind: 'Array',
+                                    element_kind: 'Reference',
+                                    elements: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    kind: 'Map',
+                    field_name: 'hook_badges',
+                    key_kind: 'Reference',
+                    key_type_name: 'ComponentAddress',
+                    value_kind: 'Own',
+                    value_type_name: 'Vault',
+                    entries: [],
+                },
+                {
+                    kind: 'Tuple',
+                    type_name: 'Oracle',
+                    field_name: 'oracle',
+                    fields: [
+                        {
+                            kind: 'Own',
+                            type_name: 'KeyValueStore',
+                            field_name: 'observations',
+                            value: 'internal_keyvaluestore_rdx1krzv59c6nn43y8zmp3j0kmqdmxfep2vgjs0cj09al0l6zrm5tlvj4d',
+                        },
+                        {
+                            kind: 'Enum',
+                            type_name: 'Option',
+                            field_name: 'last_observation_index',
+                            variant_id: '1',
+                            variant_name: 'Some',
+                            fields: [
+                                {
+                                    kind: 'U16',
+                                    value: '3210',
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'U16',
+                            field_name: 'observations_stored',
+                            value: '3211',
+                        },
+                        {
+                            kind: 'Enum',
+                            type_name: 'Option',
+                            field_name: 'sub_observations',
+                            variant_id: '1',
+                            variant_name: 'Some',
+                            fields: [
+                                {
+                                    kind: 'Tuple',
+                                    type_name: 'SubObservations',
+                                    fields: [
+                                        {
+                                            kind: 'PreciseDecimal',
+                                            field_name: 'price_sqrt_sum',
+                                            value: '4.093043071561028153376905943915838968',
+                                        },
+                                        {
+                                            kind: 'PreciseDecimal',
+                                            field_name: 'price_sqrt_last',
+                                            value: '0.170709179821498589523144422307580686',
+                                        },
+                                        {
+                                            kind: 'I64',
+                                            type_name: 'Instant',
+                                            field_name: 'last_updated',
+                                            value: '1743694944',
+                                        },
+                                        {
+                                            kind: 'Enum',
+                                            type_name: 'Option',
+                                            field_name: 'initialization',
+                                            variant_id: '0',
+                                            variant_name: 'None',
+                                            fields: [],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            kind: 'U16',
+                            field_name: 'observations_limit',
+                            value: '65535',
+                        },
+                    ],
+                },
+            ],
+        };
+        // Generated TypeScript schema for Scrypto SBOR types of package address: package_rdx1pkl8tdw43xqx64etxwdf8rjtvptqurq4c3fky0kaj6vwa0zrkfmcmc
+
+        const HookCalls = s.struct({
+            before_instantiate: s.tuple([s.string(), s.array(s.address())]),
+            after_instantiate: s.tuple([s.string(), s.array(s.address())]),
+            before_add_liquidity: s.tuple([s.string(), s.array(s.address())]),
+            after_add_liquidity: s.tuple([s.string(), s.array(s.address())]),
+            before_swap: s.tuple([s.string(), s.array(s.address())]),
+            after_swap: s.tuple([s.string(), s.array(s.address())]),
+            before_remove_liquidity: s.tuple([
+                s.string(),
+                s.array(s.address()),
+            ]),
+            after_remove_liquidity: s.tuple([s.string(), s.array(s.address())]),
+        });
+
+        const Node = s.struct({
+            key: s.number(),
+            value: s.tuple([]),
+            left_child: s.option(s.number()),
+            right_child: s.option(s.number()),
+            parent: s.option(s.number()),
+            next: s.option(s.number()),
+            prev: s.option(s.number()),
+            balance_factor: s.number(),
+        });
+
+        const AvlTree = s.struct({
+            root: s.option(s.number()),
+            store: s.internalAddress(),
+            store_cache: s.map({ key: s.number(), value: Node }),
+        });
+
+        const SubObservations = s.struct({
+            price_sqrt_sum: s.decimal(),
+            price_sqrt_last: s.decimal(),
+            last_updated: s.instant(),
+            initialization: s.option(s.instant()),
+        });
+
+        const Oracle = s.struct({
+            observations: s.internalAddress(),
+            last_observation_index: s.option(s.number()),
+            observations_stored: s.number(),
+            sub_observations: s.option(SubObservations),
+            observations_limit: s.number(),
+        });
+
+        const PrecisionPool = s.struct({
+            pool_address: s.address(),
+            x_liquidity: s.internalAddress(),
+            y_liquidity: s.internalAddress(),
+            x_fees: s.internalAddress(),
+            y_fees: s.internalAddress(),
+            tick_spacing: s.number(),
+            max_liquidity_per_tick: s.decimal(),
+            price_sqrt: s.decimal(),
+            active_tick: s.option(s.number()),
+            active_liquidity: s.decimal(),
+            lp_manager: s.address(),
+            lp_counter: s.number(),
+            ticks: AvlTree,
+            registry: s.address(),
+            next_sync_time: s.number(),
+            input_fee_rate: s.decimal(),
+            fee_protocol_share: s.decimal(),
+            x_lp_fee: s.decimal(),
+            y_lp_fee: s.decimal(),
+            x_protocol_fee: s.internalAddress(),
+            y_protocol_fee: s.internalAddress(),
+            instantiated_at: s.number(),
+            flash_manager: s.address(),
+            flash_loan_fee_rate: s.decimal(),
+            hooks: s.map({
+                key: s.tuple([s.address(), s.string()]),
+                value: s.address(),
+            }),
+            hook_calls: HookCalls,
+            hook_badges: s.map({
+                key: s.address(),
+                value: s.internalAddress(),
+            }),
+            oracle: Oracle,
+        });
+
+        const result = PrecisionPool.safeParse(example);
+        console.log(result);
+    });
 });

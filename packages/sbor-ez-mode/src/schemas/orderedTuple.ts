@@ -23,7 +23,7 @@ export class OrderedTupleSchema<T extends TupleSchema> extends SborSchema<{
             !('kind' in value) ||
             value.kind !== 'Tuple'
         ) {
-            throw new SborError('Invalid tuple structure', path);
+            throw new SborError('The object is not a tuple', path);
         }
 
         const tupleValue = value as ProgrammaticScryptoSborValueTuple;
