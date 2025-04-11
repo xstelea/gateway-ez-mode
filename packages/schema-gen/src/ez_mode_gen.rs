@@ -8,6 +8,13 @@ use scrypto::prelude::{
 use std::borrow::Cow;
 use std::collections::HashSet;
 
+/// This module is responsible for generating sbor-ez-mode TypeScript
+/// schemas from Scrypto SBOR types.
+/// It takes a few related Scrypto SBOR schemas, and parses them into an
+/// intermediate representation which is more suitable for rendering out
+/// to sbor-ez-mode TypeScript schemas. Then, this intermediate
+/// representation can be rendered out to TypeScript code.
+
 /// Whether a RegistryEntry can be rendered inline
 fn is_inline(entry: &RegistryEntry) -> bool {
     match entry.schema_kind {
