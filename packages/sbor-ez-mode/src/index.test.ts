@@ -1178,7 +1178,7 @@ describe('sbor', () => {
         expectTypeOf(result).toEqualTypeOf<string>();
     });
 
-    it('testing generated schema', () => {
+    it('testing generated schema of ociswap precisionpool', () => {
         const example: ProgrammaticScryptoSborValue = {
             kind: 'Tuple',
             type_name: 'PrecisionPool',
@@ -1374,7 +1374,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1390,7 +1389,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1406,7 +1404,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1422,7 +1419,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1438,7 +1434,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1454,7 +1449,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1470,7 +1464,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1486,7 +1479,6 @@ describe('sbor', () => {
                                 {
                                     kind: 'Array',
                                     element_kind: 'Reference',
-                                    element_name: 'ComponentAddress',
                                     elements: [],
                                 },
                             ],
@@ -1579,11 +1571,25 @@ describe('sbor', () => {
                 },
             ],
         };
-        const Type3 = s.tuple([]);
+        // Generated TypeScript schema for Scrypto SBOR types of package address: package_rdx1pkl8tdw43xqx64etxwdf8rjtvptqurq4c3fky0kaj6vwa0zrkfmcmc
+
+        const HookCalls = s.struct({
+            before_instantiate: s.tuple([s.string(), s.array(s.address())]),
+            after_instantiate: s.tuple([s.string(), s.array(s.address())]),
+            before_add_liquidity: s.tuple([s.string(), s.array(s.address())]),
+            after_add_liquidity: s.tuple([s.string(), s.array(s.address())]),
+            before_swap: s.tuple([s.string(), s.array(s.address())]),
+            after_swap: s.tuple([s.string(), s.array(s.address())]),
+            before_remove_liquidity: s.tuple([
+                s.string(),
+                s.array(s.address()),
+            ]),
+            after_remove_liquidity: s.tuple([s.string(), s.array(s.address())]),
+        });
 
         const Node = s.struct({
             key: s.number(),
-            value: Type3,
+            value: s.tuple([]),
             left_child: s.option(s.number()),
             right_child: s.option(s.number()),
             parent: s.option(s.number()),
@@ -1596,21 +1602,6 @@ describe('sbor', () => {
             root: s.option(s.number()),
             store: s.internalAddress(),
             store_cache: s.map({ key: s.number(), value: Node }),
-        });
-
-        const Type4 = s.tuple([s.address(), s.string()]);
-
-        const Type6 = s.tuple([s.string(), s.array(s.address())]);
-
-        const HookCalls = s.struct({
-            before_instantiate: Type6,
-            after_instantiate: Type6,
-            before_add_liquidity: Type6,
-            after_add_liquidity: Type6,
-            before_swap: Type6,
-            after_swap: Type6,
-            before_remove_liquidity: Type6,
-            after_remove_liquidity: Type6,
         });
 
         const SubObservations = s.struct({
@@ -1653,7 +1644,10 @@ describe('sbor', () => {
             instantiated_at: s.number(),
             flash_manager: s.address(),
             flash_loan_fee_rate: s.decimal(),
-            hooks: s.map({ key: Type4, value: s.address() }),
+            hooks: s.map({
+                key: s.tuple([s.address(), s.string()]),
+                value: s.address(),
+            }),
             hook_calls: HookCalls,
             hook_badges: s.map({
                 key: s.address(),
@@ -1665,6 +1659,4 @@ describe('sbor', () => {
         const result = PrecisionPool.safeParse(example);
         console.log(result);
     });
-
-    it('testing another generated schema', () => {});
 });
