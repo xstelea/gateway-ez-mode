@@ -8,43 +8,42 @@ use scrypto::prelude::{
 use std::borrow::Cow;
 use std::collections::HashSet;
 
-//
-// Helper: whether a RegistryEntry can be rendered inline
-//
+/// Whether a RegistryEntry can be rendered inline
 fn is_inline(entry: &RegistryEntry) -> bool {
     match entry.schema_kind {
-        TypeScriptSchemaKind::Address
-        | TypeScriptSchemaKind::InternalAddress
-        | TypeScriptSchemaKind::Number
-        | TypeScriptSchemaKind::String
-        | TypeScriptSchemaKind::Bool
-        | TypeScriptSchemaKind::Decimal
-        | TypeScriptSchemaKind::NonFungibleLocalId
-        | TypeScriptSchemaKind::Array { .. }
-        | TypeScriptSchemaKind::Option { .. }
-        | TypeScriptSchemaKind::Value
-        | TypeScriptSchemaKind::Instant
-        | TypeScriptSchemaKind::Map { .. } => true,
+        SborEzModeSchemaKind::Address
+        | SborEzModeSchemaKind::InternalAddress
+        | SborEzModeSchemaKind::Number
+        | SborEzModeSchemaKind::String
+        | SborEzModeSchemaKind::Bool
+        | SborEzModeSchemaKind::Decimal
+        | SborEzModeSchemaKind::NonFungibleLocalId
+        | SborEzModeSchemaKind::Array { .. }
+        | SborEzModeSchemaKind::Option { .. }
+        | SborEzModeSchemaKind::Value
+        | SborEzModeSchemaKind::Instant
+        | SborEzModeSchemaKind::Map { .. } => true,
         // Anonymous tuples should be rendered inline, while named tuples should be rendered separately.
-        TypeScriptSchemaKind::Tuple { .. } => entry.type_name.is_none(),
+        SborEzModeSchemaKind::Tuple { .. } => entry.type_name.is_none(),
         _ => false,
     }
 }
 
-/// A registry entry holds a type’s metadata and its computed TypeScript schema expression.
+/// A registry entry representing a type in sbor-ez-mode
 #[derive(Clone, Debug)]
 pub struct RegistryEntry {
+    // a "hash" of the type, used to compare it to other types
     pub type_hash: TypeHash,
-    /// The variable name used in the TypeScript output.
+    // The name of the type in the sbor schema, if any
     pub type_name: Option<String>,
-    /// The computed TypeScript schema (s.* expression).
-    pub schema_kind: TypeScriptSchemaKind,
-    /// A set of dependency indices.
+    // The target type in sbor-ez-mode
+    pub schema_kind: SborEzModeSchemaKind,
+    /// A set of dependency indices of the types this type depends on.
     pub dependencies: HashSet<u32>,
 }
 
 impl RegistryEntry {
-    /// Returns a unique variable name based on the type and its index in the registry.
+    /// Returns a unique variable name based on the type and its index in the registry if the type name is not unique.
     pub fn unique_var_name(&self, registry: &SchemaRegistry) -> String {
         let position =
             registry.entries.iter().position(|e| e == self).unwrap_or(0);
@@ -65,8 +64,8 @@ impl RegistryEntry {
     /// Render the entry into a TypeScript expression.
     pub fn render(&self, registry: &SchemaRegistry) -> String {
         match &self.schema_kind {
-            TypeScriptSchemaKind::Address => "s.address()".to_string(),
-            TypeScriptSchemaKind::Map {
+            SborEzModeSchemaKind::Address => "s.address()".to_string(),
+            SborEzModeSchemaKind::Map {
                 key_type,
                 value_type,
             } => {
@@ -86,19 +85,19 @@ impl RegistryEntry {
                     }
                 )
             }
-            TypeScriptSchemaKind::String => "s.string()".to_string(),
-            TypeScriptSchemaKind::Decimal => "s.decimal()".to_string(),
-            TypeScriptSchemaKind::InternalAddress => {
+            SborEzModeSchemaKind::String => "s.string()".to_string(),
+            SborEzModeSchemaKind::Decimal => "s.decimal()".to_string(),
+            SborEzModeSchemaKind::InternalAddress => {
                 "s.internalAddress()".to_string()
             }
-            TypeScriptSchemaKind::Number => "s.number()".to_string(),
-            TypeScriptSchemaKind::Bool => "s.bool()".to_string(),
-            TypeScriptSchemaKind::Instant => "s.instant()".to_string(),
-            TypeScriptSchemaKind::NonFungibleLocalId => {
+            SborEzModeSchemaKind::Number => "s.number()".to_string(),
+            SborEzModeSchemaKind::Bool => "s.bool()".to_string(),
+            SborEzModeSchemaKind::Instant => "s.instant()".to_string(),
+            SborEzModeSchemaKind::NonFungibleLocalId => {
                 "s.nonFungibleLocalId()".to_string()
             }
-            TypeScriptSchemaKind::Value => "s.value()".to_string(),
-            TypeScriptSchemaKind::Array { element_type } => {
+            SborEzModeSchemaKind::Value => "s.value()".to_string(),
+            SborEzModeSchemaKind::Array { element_type } => {
                 let entry = &registry.entries[*element_type as usize];
                 format!(
                     "s.array({})",
@@ -109,7 +108,7 @@ impl RegistryEntry {
                     }
                 )
             }
-            TypeScriptSchemaKind::Tuple { fields } => {
+            SborEzModeSchemaKind::Tuple { fields } => {
                 let field_entries: Vec<String> = fields
                     .iter()
                     .map(|&field_type| {
@@ -123,7 +122,7 @@ impl RegistryEntry {
                     .collect();
                 format!("s.tuple([{}])", field_entries.join(", "))
             }
-            TypeScriptSchemaKind::Struct { fields } => {
+            SborEzModeSchemaKind::Struct { fields } => {
                 let field_entries: Vec<String> = fields
                     .iter()
                     .map(|(name, field_type)| {
@@ -141,7 +140,7 @@ impl RegistryEntry {
                     .collect();
                 format!("s.struct({{\n  {}\n}})", field_entries.join(",\n  "))
             }
-            TypeScriptSchemaKind::Enum { variants } => {
+            SborEzModeSchemaKind::Enum { variants } => {
                 let variant_entries: Vec<String> = variants
                     .iter()
                     .map(|(name, variant_type)| {
@@ -159,7 +158,7 @@ impl RegistryEntry {
                     .collect();
                 format!("s.enum([\n{}\n])", variant_entries.join(",\n"))
             }
-            TypeScriptSchemaKind::Option { inner_types } => {
+            SborEzModeSchemaKind::Option { inner_types } => {
                 let inner_entries: Vec<String> = inner_types
                     .iter()
                     .map(|&inner_type| {
@@ -193,6 +192,8 @@ impl Eq for RegistryEntry {}
 pub struct TypeHash(pub String);
 
 impl TypeHash {
+    /// Kind of assuming that the metadata is unique for each type.
+    /// But it seems to work?
     pub fn create(
         metadata: &TypeMetadata,
         kind: &TypeKind<ScryptoCustomTypeKind, LocalTypeId>,
@@ -202,9 +203,9 @@ impl TypeHash {
     }
 }
 
-/// Represents the kinds of TypeScript schemas to generate.
+/// Represents the types of sbor-ez-mode schema constructors that we have available.
 #[derive(Clone, Debug)]
-pub enum TypeScriptSchemaKind {
+pub enum SborEzModeSchemaKind {
     Struct { fields: Vec<(String, u32)> },
     Tuple { fields: Vec<u32> },
     Array { element_type: u32 },
@@ -222,21 +223,17 @@ pub enum TypeScriptSchemaKind {
     Value,
 }
 
-/// The registry collects generated types. It also lets us deduplicate types
-/// by comparing their computed TypeScript expressions.
+/// The registry collects generated types.
 #[derive(Default, Debug)]
 pub struct SchemaRegistry {
     /// Entries are stored in the order they were registered.
     pub entries: Vec<RegistryEntry>,
-    /// Track currently processing types.
-    pub processing: HashSet<LocalTypeId>,
 }
 
 impl SchemaRegistry {
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
-            processing: HashSet::new(),
         }
     }
 
@@ -259,6 +256,9 @@ impl SchemaRegistry {
         occurrences <= 1
     }
 
+    /// Manually register a type. This can be used if the type does not map exactly
+    /// onto a sbor-ez-mode type, for example with enums, where we distinguish between
+    /// struct and tuple variants, and register those structs as types.
     pub fn register(&mut self, entry: &RegistryEntry) -> u32 {
         if let Some((i, _)) = self
             .entries
@@ -387,10 +387,8 @@ impl SchemaRegistry {
     }
 }
 
-///
-/// Helper: Registers a type by resolving its kind and metadata.
+/// Registers a type by resolving its kind and metadata.
 /// This function encapsulates the pattern of resolving a type and calling get_or_register.
-///
 fn register_type(
     registry: &mut SchemaRegistry,
     schema: &Schema<ScryptoCustomSchema>,
@@ -440,7 +438,7 @@ fn handle_tuple(
         RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::Struct { fields },
+            schema_kind: SborEzModeSchemaKind::Struct { fields },
             dependencies,
         }
     } else {
@@ -462,7 +460,7 @@ fn handle_tuple(
         RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::Tuple { fields: indices },
+            schema_kind: SborEzModeSchemaKind::Tuple { fields: indices },
             dependencies,
         }
     }
@@ -484,7 +482,7 @@ fn handle_array(
     RegistryEntry {
         type_hash: TypeHash::create(metadata, kind),
         type_name: metadata.get_name().map(|s| s.to_string()),
-        schema_kind: TypeScriptSchemaKind::Array {
+        schema_kind: SborEzModeSchemaKind::Array {
             element_type: index,
         },
         dependencies,
@@ -516,7 +514,7 @@ fn handle_map(
     RegistryEntry {
         type_hash: TypeHash::create(metadata, kind),
         type_name: metadata.get_name().map(|s| s.to_string()),
-        schema_kind: TypeScriptSchemaKind::Map {
+        schema_kind: SborEzModeSchemaKind::Map {
             key_type: key_index,
             value_type: value_index,
         },
@@ -534,12 +532,12 @@ fn handle_custom(
     let schema_kind = match custom {
         ScryptoCustomTypeKind::Decimal
         | ScryptoCustomTypeKind::PreciseDecimal => {
-            TypeScriptSchemaKind::Decimal
+            SborEzModeSchemaKind::Decimal
         }
-        ScryptoCustomTypeKind::Reference => TypeScriptSchemaKind::Address,
-        ScryptoCustomTypeKind::Own => TypeScriptSchemaKind::InternalAddress,
+        ScryptoCustomTypeKind::Reference => SborEzModeSchemaKind::Address,
+        ScryptoCustomTypeKind::Own => SborEzModeSchemaKind::InternalAddress,
         ScryptoCustomTypeKind::NonFungibleLocalId => {
-            TypeScriptSchemaKind::NonFungibleLocalId
+            SborEzModeSchemaKind::NonFungibleLocalId
         }
     };
     RegistryEntry {
@@ -579,7 +577,7 @@ fn handle_enum(
                 return RegistryEntry {
                     type_hash: TypeHash::create(metadata, kind),
                     type_name: metadata.get_name().map(|s| s.to_string()),
-                    schema_kind: TypeScriptSchemaKind::Option {
+                    schema_kind: SborEzModeSchemaKind::Option {
                         inner_types: vec![index],
                     },
                     dependencies,
@@ -602,7 +600,7 @@ fn handle_enum(
                 return RegistryEntry {
                     type_hash: TypeHash::create(metadata, kind),
                     type_name: metadata.get_name().map(|s| s.to_string()),
-                    schema_kind: TypeScriptSchemaKind::Option {
+                    schema_kind: SborEzModeSchemaKind::Option {
                         inner_types: indices,
                     },
                     dependencies,
@@ -647,7 +645,7 @@ fn handle_enum(
                     let entry = RegistryEntry {
                         type_hash: TypeHash::create(metadata, kind),
                         type_name: None,
-                        schema_kind: TypeScriptSchemaKind::Struct {
+                        schema_kind: SborEzModeSchemaKind::Struct {
                             fields: fields_indices,
                         },
                         dependencies,
@@ -672,7 +670,7 @@ fn handle_enum(
                     let entry = RegistryEntry {
                         type_hash: TypeHash::create(metadata, kind),
                         type_name: None,
-                        schema_kind: TypeScriptSchemaKind::Tuple {
+                        schema_kind: SborEzModeSchemaKind::Tuple {
                             fields: indices,
                         },
                         dependencies,
@@ -697,7 +695,7 @@ fn handle_enum(
         RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::Enum {
+            schema_kind: SborEzModeSchemaKind::Enum {
                 variants: variant_indices,
             },
             dependencies,
@@ -742,7 +740,7 @@ fn create_entry(
         | TypeKind::I128 => RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::Number,
+            schema_kind: SborEzModeSchemaKind::Number,
             dependencies: HashSet::new(),
         },
         TypeKind::I64 => {
@@ -755,14 +753,14 @@ fn create_entry(
                 RegistryEntry {
                     type_hash: TypeHash::create(metadata, kind),
                     type_name: metadata.get_name().map(|s| s.to_string()),
-                    schema_kind: TypeScriptSchemaKind::Instant,
+                    schema_kind: SborEzModeSchemaKind::Instant,
                     dependencies: HashSet::new(),
                 }
             } else {
                 RegistryEntry {
                     type_hash: TypeHash::create(metadata, kind),
                     type_name: metadata.get_name().map(|s| s.to_string()),
-                    schema_kind: TypeScriptSchemaKind::Number,
+                    schema_kind: SborEzModeSchemaKind::Number,
                     dependencies: HashSet::new(),
                 }
             }
@@ -770,13 +768,13 @@ fn create_entry(
         TypeKind::String => RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::String,
+            schema_kind: SborEzModeSchemaKind::String,
             dependencies: HashSet::new(),
         },
         TypeKind::Any => RegistryEntry {
             type_hash: TypeHash::create(metadata, kind),
             type_name: metadata.get_name().map(|s| s.to_string()),
-            schema_kind: TypeScriptSchemaKind::Value,
+            schema_kind: SborEzModeSchemaKind::Value,
             dependencies: HashSet::new(),
         },
     }
@@ -798,7 +796,9 @@ fn get_type_by_index(
         })
 }
 
-// Generates the IR registry from a list of schemas.
+/// takesa few related schemas and generates a schema registry
+/// with all the sbor-ez-mode types in it. This can be considered a
+/// kind of intermediate representation for the schema of the package.
 pub fn generate_ir(schemas: &[BlueprintWithSchema]) -> SchemaRegistry {
     let mut registry = SchemaRegistry::new();
     let mut main_vars = Vec::new();
