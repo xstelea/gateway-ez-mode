@@ -1,2 +1,2 @@
+pub mod ez_mode_gen;
 pub mod gateway;
-pub mod schema;

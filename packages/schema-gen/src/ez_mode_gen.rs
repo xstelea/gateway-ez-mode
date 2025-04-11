@@ -343,7 +343,7 @@ impl SchemaRegistry {
     }
 
     /// Render the registry entries in topologically sorted order.
-    pub fn render(&self) -> String {
+    pub fn render(&self, package_address: &str, module: bool) -> String {
         let mut output = String::new();
         let sorted_indices =
             self.topologically_sorted_indices().unwrap_or_else(|err| {
@@ -351,16 +351,39 @@ impl SchemaRegistry {
             });
         for i in sorted_indices {
             let entry = &self.entries[i as usize];
+            if entry.type_name == Some("AvlTree".to_string()) {
+                println!("{:?}", entry);
+                println!("Index: {}", i);
+            }
+            if entry.type_name == Some("Node".to_string()) {
+                println!("{:?}", entry);
+                println!("Index: {}", i);
+            }
             if is_inline(entry) {
                 continue;
             }
             output.push_str(&format!(
-                "const {} = {};\n\n",
+                "{}const {} = {};\n\n",
+                if module { "export " } else { "" },
                 entry.unique_var_name(self),
                 entry.render(self)
             ));
         }
-        output
+
+        let mut final_output = String::new();
+
+        if module {
+            final_output.push_str(&format!(
+                "import s from '@calamari-radix/sbor-ez-mode';\n"
+            ));
+        }
+
+        final_output.push_str(&format!(
+            "// Generated TypeScript schema for Scrypto SBOR types of package address: {}\n\n",
+            package_address
+        ));
+        final_output.push_str(&output);
+        final_output
     }
 }
 
@@ -482,11 +505,14 @@ fn handle_map(
     let (key_entry, key_index) = register_type(registry, schema, key_type);
     let (value_entry, value_index) =
         register_type(registry, schema, value_type);
-    let dependencies: HashSet<u32> = key_entry
+    let mut dependencies: HashSet<u32> = key_entry
         .dependencies
         .union(&value_entry.dependencies)
         .cloned()
         .collect();
+    // Explicitly add direct dependency indices for key and value.
+    dependencies.insert(key_index);
+    dependencies.insert(value_index);
     RegistryEntry {
         type_hash: TypeHash::create(metadata, kind),
         type_name: metadata.get_name().map(|s| s.to_string()),
@@ -497,7 +523,6 @@ fn handle_map(
         dependencies,
     }
 }
-
 ///
 /// Helper: Handle custom Scrypto types.
 ///
